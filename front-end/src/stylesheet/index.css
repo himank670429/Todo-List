@@ -1,0 +1,170 @@
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans&family=Poppins:wght@900&family=Roboto:wght@300&family=Shantell+Sans:ital,wght@1,800&display=swap");
+.header {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 0.14rem #D9D9D9 solid;
+}
+
+.main {
+  flex-grow: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  align-content: flex-start;
+}
+
+.footer {
+  min-height: 8rem;
+  display: flex;
+  align-items: center;
+  border-top: 0.14rem solid #D9D9D9;
+  gap: 4rem;
+}
+
+[data-color=blue] {
+  color: #0277FF;
+}
+
+[data-color=black] {
+  color: black;
+}
+
+.logo {
+  padding-top: 1em;
+  padding-bottom: 1em;
+  font-weight: bold;
+  font-size: 27px;
+}
+
+.header-item {
+  flex: 1;
+  align-items: center;
+  display: flex;
+}
+
+.header-item-start {
+  justify-content: flex-start;
+}
+
+.header-item-middle {
+  justify-content: center;
+}
+
+.header-item-end {
+  justify-content: flex-end;
+}
+
+.btn {
+  outline: none;
+  border: none;
+  cursor: pointer;
+  background-color: inherit;
+  padding: 0.5em 1.2em;
+  border-radius: 0.5em;
+  margin: 0.5rem;
+  font-size: 15px;
+  display: flex;
+  gap: 0.3rem;
+  align-items: center;
+}
+
+.btn-primary {
+  background-color: #0277FF;
+  color: white;
+  outline: 0.2rem #0277FF solid;
+}
+
+.btn-secondary {
+  background-color: white;
+  color: #0277FF;
+  outline: 0.2rem #0277FF solid;
+}
+
+.footer-item {
+  text-decoration: none;
+  font-weight: bold;
+  color: #4B4B4B;
+  font-size: 14px;
+}
+
+.footer-link {
+  color: #0277FF;
+}
+
+.card {
+  color: white;
+  border-radius: 1rem;
+  display: flex;
+  flex-direction: column;
+  margin: 1rem;
+  width: 296px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  cursor: pointer;
+  transition: scale 0.2s ease-in, box-shadow 0.2s ease-in;
+}
+.card:hover {
+  scale: 1.02;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+.card-info {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+}
+.card-info .card-info-title {
+  padding-bottom: 1rem;
+  display: flex;
+  font-size: 33px;
+  gap: 0.3rem;
+  align-items: center;
+  font-weight: bold;
+}
+.card-info .card-info-date {
+  font-weight: bold;
+  font-size: 13px;
+  margin-left: 1em;
+}
+
+.card-task-info {
+  display: flex;
+  padding: 1rem;
+  background-color: rgba(0, 0, 0, 0.4);
+  font-weight: bold;
+  justify-content: space-between;
+}
+
+.badge-small {
+  font-size: 12px;
+  font-weight: bold;
+  background: rgba(255, 255, 255, 0.4);
+  padding: 0.15em 0.7em;
+  border-radius: 1em;
+  margin-inline: 0.8em;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  font-family: "Open Sans", sans-serif;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+}
+body::-webkit-scrollbar {
+  width: 1rem;
+}
+body::-webkit-scrollbar-thumb {
+  background-color: #D9D9D9;
+  border-radius: 1rem;
+}
+
+.container {
+  width: 90dvw;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}/*# sourceMappingURL=index.css.map */
