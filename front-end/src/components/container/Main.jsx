@@ -1,11 +1,14 @@
 import Card from "../simple/card"
 import useAppData from "../../hooks/useAppData"
 function Main() {
-  const {tasks} = useAppData();
-  console.log(tasks)
+  const {data} = useAppData();
   return (
-    <div className="main">
-      {tasks.map(({card, current, completed}, index) => <Card 
+    <div className={`main ${(data.tasks.length === 0) ? "empty" : ""}`}>
+      {(data.tasks.length === 0) 
+      ? <div className="indicator-large" >
+          you dont have any task category
+        </div>
+      : data.tasks.map(({card, current, completed}, index) => <Card 
         key = {index}
         theme = {card.theme}
         title = {card.title}

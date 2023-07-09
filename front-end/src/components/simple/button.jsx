@@ -1,14 +1,18 @@
-export function ButtonPrimary({icon, text}){
+export function ButtonPrimary({icon, text, eventHandler}){
     return (
-        <button className = 'btn btn-primary'>
+        <button 
+        className = 'btn btn-primary'
+        onClick = {eventHandler}>
             {icon}
             {text}
         </button>
     )
 }
-export function ButtonSecondary({icon, text}){
+export function ButtonSecondary({icon, text, eventHandler}){
     return (
-        <button className = 'btn btn-secondary'>
+        <button 
+        className = 'btn btn-secondary'
+        onClick = {eventHandler}>
             {icon}
             {text}
         </button>
