@@ -1,23 +1,49 @@
 import Card from "../simple/card"
 import useAppData from "../../hooks/useAppData"
+import {useLocation} from 'react-router-dom'
+import { useNavigate } from "react-router-dom";
+import TaskTabs from "../simple/TaskTabs";
+import useTaskGroup from "../../hooks/useTaskGroup";
+
 function Main() {
   const {data} = useAppData();
-  return (
-    <div className={`main ${(data.tasks.length === 0) ? "empty" : ""}`}>
+  const {pathname} = useLocation();
+  const isHomeRoute = pathname === '/Home'
+  const isTaskRoute = pathname === '/Task'
+  const navigate = useNavigate();
+  const {setCurrentGroupIndex} = useTaskGroup();
+
+  function homeMain(){
+    return (
+    <div className={`main wrapper-flex ${(data.tasks.length === 0) ? "empty" : ""}`}>
       {(data.tasks.length === 0) 
       ? <div className="indicator-large" >
           you dont have any task category
         </div>
-      : data.tasks.map(({card, current, completed}, index) => <Card 
-        key = {index}
-        theme = {card.theme}
-        title = {card.title}
-        date = {card.date}
-        current={current.length}
-        completed={completed.length}
-      />)}
+      : data.tasks.map((item, index) => <Card 
+          key = {index} 
+          data = {item} 
+          eventHandler = {() => {
+            setCurrentGroupIndex(index)
+            navigate('/Task')
+          }}
+        />)}
     </div>
-  )
+    )
+  }
+
+  function taskMain(){
+    return (
+      <div className = 'main'>
+        <TaskTabs />
+      </div>
+    )
+  }
+
+  return (<>
+    {isHomeRoute && homeMain()}
+    {isTaskRoute && taskMain()}
+  </>)
 }
 
 export default Main

@@ -2,32 +2,41 @@ import { useEffect, useRef, useState } from "react";
 import useTaskGroupModalRef from "../../hooks/useTaskGroupModalRef";
 import { ButtonPrimary, ButtonSecondary } from "./button";
 import useAppData from "../../hooks/useAppData";
+import { hexToRgb } from "../../helper/color";
+import useDate from "../../hooks/useDate";
 export function TaskCategoryCreate(){
     const refference = useTaskGroupModalRef();
-    const {update} = useAppData();
+    const {data, update} = useAppData();
     const categoryRef = useRef();
     const colorRef = useRef();
+
+    const {day, month, year} = useDate();
+    
+    const [error, setError] = useState(false)
 
     const [rgbValue, setRbgValue] = useState([0,0,0]);
     const [hexValue, setHexValue] = useState('#000000');
 
     const [category, setCategory] = useState('');
 
-    function hexToRgb(hex) {
-        const r = parseInt(hex.slice(1, 3), 16);
-        const g = parseInt(hex.slice(3, 5), 16);
-        const b = parseInt(hex.slice(5, 7), 16);
-        return [r,g,b];
-    }
     function addZeroes(num){
         return String(num).padStart(2, '0');
+    }
+    // console.log(data)
+
+    function RenderNote(){
+        return <>
+        {error 
+        ? <p className="modal-container-error">Note : enter name for yout task category.</p> 
+        : <p className = "modal-container-note">Note : Color organization simplifies life, saves time, and adds beauty to your surroundings. add color you your task group to make easier to work with.</p>}
+        </>
     }
 
     function addTaskCategory(){
         update(prev => {
-            const date = new Date()
-            const date_string = `${addZeroes(date.getDate())}/${addZeroes(date.getMonth()+1)}/${addZeroes(date.getFullYear())}`
+            const date_string = `${addZeroes(day)}/${addZeroes(month)}/${addZeroes(year)}`
             const newEntry = {
+                id : prev.tasks.length ?? 0,
                 card : {
                     title : category,
                     date : date_string,
@@ -36,6 +45,7 @@ export function TaskCategoryCreate(){
                 completed : [], 
                 current : []
             }
+
             const updated_value = {...prev}
             updated_value.tasks.push(newEntry)
             return updated_value
@@ -60,7 +70,7 @@ export function TaskCategoryCreate(){
                 <div className = 'modal-section'>
                     <label className = "modal-container-label" htmlFor = 'category-name'>category name</label>
                     <input ref = {categoryRef} className = "modal-container-input input-text" type = 'text' id = 'category-name' placeholder="e.g. Daily Task" onChange={(e) => setCategory(e.target.value)}/>
-                    <p className = "modal-container-note">Note : Color organization simplifies life, saves time, and adds beauty to your surroundings. add color you your task group to make easier to work with.</p>
+                    <RenderNote />
                 </div>
                 <div className="modal-section">
                     <label className = "modal-container-label" htmlFor = 'category-color'>choose your color</label>
@@ -84,6 +94,11 @@ export function TaskCategoryCreate(){
                     </div>
                     <div style = {{display: "flex"}}>
                         <ButtonPrimary text = 'Done' eventHandler={() => {
+                            if (category === ""){
+                                setError(true)
+                                categoryRef.current.focus();
+                                return;
+                            }
                             addTaskCategory()
                             cleanUp()
                         }}/>
