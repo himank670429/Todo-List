@@ -4,6 +4,7 @@ export const DataContext = createContext();
 export function DataProvider({children}){
     const [appData, setAppData] = useState({
         username : "username",
+        avatar : null,
         tasks : [
             {   
                 id : 0,
@@ -43,10 +44,17 @@ export function DataProvider({children}){
     
     const [currentGroupIndex, setCurrentGroupIndex] = useState(null);
     
+    function deleteTaskGroup(id){
+        setAppData(prev => {
+            const updated_value = {...prev}
+            updated_value.tasks = updated_value.tasks.filter(item => item.id !== id)
+            return updated_value
+        })
+    }
+
     function addCurrentTask(desc, date){
         setAppData(prev => {
             const updated_value = {...prev}
-            const date_string = 
             updated_value.tasks[currentGroupIndex].current.push({
                 id : crypto.randomUUID(),
                 desc,
@@ -111,6 +119,8 @@ export function DataProvider({children}){
         currentGroupIndex,
         setCurrentGroupIndex,
         taskCategoryCreateRef,
+
+        deleteTaskGroup,
 
         addCurrentTask,
         deleteCurrentTask,

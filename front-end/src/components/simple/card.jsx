@@ -1,15 +1,25 @@
-function Card({data, eventHandler}) {
-  const {card, completed, current} = data;
+import { DataContext } from "../../context/DataContext";
+import { useContext } from "react";
+function Card({data, handleTaskPage}) {
+  const {card, completed, current, id} = data;
   const {title, date, theme} = card;
+
+  const {deleteTaskGroup} = useContext(DataContext)
+
   return (
-    <div className='card' style = {{backgroundColor : theme}} onClick = {eventHandler}>
-      <span className = "card-info">
-        <span className="card-info-title">
-          <i className="fa-solid fa-check" />
-          {title}
+    <div className='card' style = {{backgroundColor : theme}}>
+      <span className = 'card-upper'>
+        <span className = "card-info" onClick = {handleTaskPage}>
+          <span className="card-info-title">
+            <i className="fa-solid fa-check" />
+            {title}
+          </span>
+          <span className="card-info-date">
+            {date}
+          </span>
         </span>
-        <span className="card-info-date">
-          {date}
+        <span className = "card-options">
+          <i className = 'fa-solid fa-trash' onClick = {() => deleteTaskGroup(id)}/>
         </span>
       </span>
       <span className = "card-task-info">

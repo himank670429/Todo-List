@@ -1,4 +1,5 @@
 import useAppData from './useAppData';
 export default  function useProfile() {
-    return useAppData().data.username;
+    const {username, avatar} = useAppData();
+    return {username, avatar};
 }

@@ -1,8 +1,8 @@
 import { useState } from "react";
 import useProfile from "../../hooks/useProfile"
 import {Link} from 'react-router-dom';
-function Profile({avatar}) {
-    const username = useProfile();
+function Profile() {
+    const {username, avatar} = useProfile();
     const [shown, setShown] = useState(false);
     return (
     <div className = "dropdown">

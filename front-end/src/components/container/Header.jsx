@@ -14,6 +14,8 @@ function Header() {
     const isHomeRoute = pathname === '/Home';
     const isTaskRoute = pathname === '/Task';
 
+    const isOtherRoute = pathname !== '/Home' && pathname !== '/Task';
+
     function homeHeader(){  
         return <>
         <span className="header-item header-item-middle"><b>Home</b></span>
@@ -47,6 +49,23 @@ function Header() {
         </div></>
     }
 
+    function genralHeader(){
+        return <>
+        <span className="header-item header-item-middle"><b>{pathname.substring(1)}</b></span>
+        <div className="header-item header-item-end">
+            <ButtonPrimary 
+                text = "back to home page"
+                icon = {<i className="fa-solid fa-circle-left"></i>}
+                eventHandler={() => {
+                    console.log(data)
+                    navigate('/Home')
+                }}
+            />
+            <Profile />
+        </div>
+        </>
+    }
+
     return (
     <div className="header">
         <span className="header-item logo">
@@ -55,7 +74,8 @@ function Header() {
         </span>
 
         {isHomeRoute && homeHeader()}
-        {isTaskRoute && taskHeader()}    
+        {isTaskRoute && taskHeader()}  
+        {isOtherRoute && genralHeader()}  
     </div>
     )
 }

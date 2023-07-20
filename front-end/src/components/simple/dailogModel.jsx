@@ -58,6 +58,7 @@ export function TaskCategoryCreate(){
         setCategory("")
         setHexValue('#000000')
         setRbgValue([0,0,0])
+        setError(false);
         refference.current.close();
     }
 

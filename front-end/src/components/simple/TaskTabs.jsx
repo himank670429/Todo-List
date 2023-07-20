@@ -14,8 +14,14 @@ function TaskTabs() {
     <>
     <div className = 'tab-container'>
       <div className='tab-nav'>
-        <span style = {{backgroundColor : (activeTab === 'current') ? color : darkColor}} onClick = {() => setActiveTab('current')} className={`tab-nav-item`}>current</span>
-        <span style = {{backgroundColor : (activeTab === 'completed') ? color : darkColor}} onClick = {() => setActiveTab('completed')} className={`tab-nav-item`}>completed</span>
+        <span style = {{backgroundColor : (activeTab === 'current') ? color : darkColor}} onClick = {() => setActiveTab('current')} className={`tab-nav-item`}>
+          <span>current</span>
+          {(currentTaskGroup.current.length === 0) ? null : <span className="badge-small">{currentTaskGroup.current.length}</span>}
+        </span>
+        <span style = {{backgroundColor : (activeTab === 'completed') ? color : darkColor}} onClick = {() => setActiveTab('completed')} className={`tab-nav-item`}>
+          <span>completed</span>
+          {(currentTaskGroup.completed.length === 0) ? null : <span className="badge-small">{currentTaskGroup.completed.length}</span>}
+        </span>
       </div>
       <div style = {{backgroundColor : color}} className='tab-content'>
         {activeTab === "completed" && currentTaskGroup.completed.map((item, index) => {

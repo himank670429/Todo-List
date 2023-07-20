@@ -3,7 +3,9 @@ export function CurrentTask({desc, id}) {
   const {deleteCurrentTask, markTaskAsDone} = useTaskGroup();
   return (
     <div className="card-inline">
-      <i className="fa-regular fa-circle" onClick = {() => markTaskAsDone(id)}></i>
+      <i className="fa-regular fa-circle" onClick = {() => {
+        markTaskAsDone(id)
+      }}></i>
       <span className="card-inline-label">{desc}</span>
       <i onClick = {() => deleteCurrentTask(id)} className="fa-solid fa-trash del"></i>
     </div>

@@ -4,14 +4,15 @@ import {useLocation} from 'react-router-dom'
 import { useNavigate } from "react-router-dom";
 import TaskTabs from "../simple/TaskTabs";
 import useTaskGroup from "../../hooks/useTaskGroup";
-
 function Main() {
   const {data} = useAppData();
+  const {setCurrentGroupIndex} = useTaskGroup();
+  
   const {pathname} = useLocation();
   const isHomeRoute = pathname === '/Home'
   const isTaskRoute = pathname === '/Task'
+
   const navigate = useNavigate();
-  const {setCurrentGroupIndex} = useTaskGroup();
 
   function homeMain(){
     return (
@@ -23,7 +24,7 @@ function Main() {
       : data.tasks.map((item, index) => <Card 
           key = {index} 
           data = {item} 
-          eventHandler = {() => {
+          handleTaskPage = {() => {
             setCurrentGroupIndex(index)
             navigate('/Task')
           }}

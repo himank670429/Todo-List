@@ -1,5 +1,6 @@
-@import url("https://fonts.googleapis.com/css2?family=Open+Sans&family=Poppins:wght@900&family=Roboto:wght@300&family=Shantell+Sans:ital,wght@1,800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans&family=Poppins:wght@900&family=Roboto:wght@300&family=Shantell+Sans:ital,wght@1,800&family=Ubuntu:wght@700&display=swap");
 .header {
+  min-height: 8rem;
   display: flex;
   justify-content: space-between;
   border-bottom: 0.14rem #D9D9D9 solid;
@@ -31,6 +32,15 @@
   align-items: center;
   border-top: 0.14rem solid #D9D9D9;
   gap: 4rem;
+}
+.footer .footer-item {
+  text-decoration: none;
+  font-weight: bold;
+  color: #4B4B4B;
+  font-size: 14px;
+}
+.footer .footer-link {
+  color: #0277FF;
 }
 
 .modal {
@@ -129,6 +139,14 @@
   color: #969696;
 }
 
+.task-tab {
+  outline: 1px solid black;
+  margin: 0;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
 .tab-container {
   display: flex;
   flex-direction: column;
@@ -201,16 +219,16 @@
   background-color: inherit;
   padding: 0.5em 1.2em;
   border-radius: 0.5em;
-  margin: 0.5rem;
+  margin: 0.5em;
   font-size: 15px;
   display: flex;
-  gap: 0.3rem;
+  gap: 0.3em;
   align-items: center;
   transition: scale 0.2s ease-in, transform 0.2s ease-in;
 }
 .btn:hover {
   scale: 1.01;
-  transform: translateY(-0.1rem);
+  transform: translateY(-0.1em);
 }
 
 .btn-primary {
@@ -223,17 +241,6 @@
   background-color: white;
   color: #0277FF;
   outline: 0.15em #0277FF solid;
-}
-
-.footer-item {
-  text-decoration: none;
-  font-weight: bold;
-  color: #4B4B4B;
-  font-size: 14px;
-}
-
-.footer-link {
-  color: #0277FF;
 }
 
 .card {
@@ -252,13 +259,26 @@
   scale: 1.02;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
 }
-
-.card-info {
+.card .card-upper {
+  display: flex;
+  padding-inline-end: 1rem;
+}
+.card .card-upper .card-options {
+  padding-top: 1rem;
+}
+.card .card-upper .card-options i {
+  transition: transform 0.2s ease;
+}
+.card .card-upper .card-options i:hover {
+  transform: scale(1.3);
+}
+.card .card-upper .card-info {
   display: flex;
   flex-direction: column;
+  flex-grow: 1;
   padding: 1rem;
 }
-.card-info .card-info-title {
+.card .card-upper .card-info .card-info-title {
   padding-bottom: 1rem;
   display: flex;
   font-size: 33px;
@@ -266,13 +286,12 @@
   align-items: center;
   font-weight: bold;
 }
-.card-info .card-info-date {
+.card .card-upper .card-info .card-info-date {
   font-weight: bold;
   font-size: 13px;
   margin-left: 1em;
 }
-
-.card-task-info {
+.card .card-task-info {
   display: flex;
   padding: 1rem;
   background-color: rgba(0, 0, 0, 0.4);
@@ -390,6 +409,7 @@
 .card-input {
   color: white;
   font-weight: bold;
+  min-height: 5rem;
 }
 .card-input input {
   font-size: 1.2rem;
@@ -407,6 +427,67 @@
 .card-input .card-input-label {
   flex-grow: 1;
   font-size: 1.2rem;
+}
+
+.about {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.about .heading-large {
+  font-size: 50px;
+  font-family: "Ubuntu", sans-serif;
+  font-weight: bold;
+}
+.about .heading-medium {
+  font-weight: none;
+  font-size: 30px;
+}
+.about .social {
+  border: 0.12rem solid #D9D9D9;
+  border-radius: 0.5rem;
+  padding: 2rem;
+  display: flex;
+  color: #4B4B4B;
+  gap: 1rem;
+  font-size: 20px;
+}
+.about .social a {
+  cursor: pointer;
+  color: inherit;
+  text-decoration: none;
+}
+
+.privacy .section:last-child hr, .terms .section:last-child hr {
+  display: none;
+}
+.privacy .section hr, .terms .section hr {
+  border: none;
+  outline: none;
+  height: 0.12rem;
+  background-color: #D9D9D9;
+}
+.privacy .section a, .terms .section a {
+  text-decoration: none;
+  color: #0277FF;
+  cursor: pointer;
+}
+.privacy .section p, .terms .section p {
+  font-size: 15px;
+  line-height: 1.4rem;
+  padding-block: 1rem;
+}
+.privacy .section h1, .terms .section h1 {
+  margin-block: 1rem;
+}
+.privacy .section h2, .terms .section h2 {
+  margin-top: 0.5rem;
+}
+.privacy .section h3, .terms .section h3 {
+  margin-top: 0.2rem;
+}
+.privacy .section ul, .terms .section ul {
+  margin-left: 1.4rem;
 }
 
 * {
