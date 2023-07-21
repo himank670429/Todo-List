@@ -24,5 +24,4 @@ dist-ssr
 *.sw?
 *.scss
 *.css.map
-
 test.js

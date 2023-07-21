@@ -7,7 +7,9 @@ export function CurrentTask({desc, id}) {
         markTaskAsDone(id)
       }}></i>
       <span className="card-inline-label">{desc}</span>
-      <i onClick = {() => deleteCurrentTask(id)} className="fa-solid fa-trash del"></i>
+      <i onClick = {() => {
+        deleteCurrentTask(id)
+      }} className="fa-solid fa-trash del"></i>
     </div>
   )
 }

@@ -2,15 +2,13 @@ import Header from "../components/container/Header"
 import Footer from "../components/container/Footer"
 import AboutContent from "../assets/About"
 function AboutUsPage() {
-  return (
-    <>
+  return <>
     <Header />
     <div className="main about">
       <AboutContent />
-    </div>
-    <Footer />
-    </>
-  )
+     </div>
+     <Footer />
+  </>
 }
 
 export default AboutUsPage

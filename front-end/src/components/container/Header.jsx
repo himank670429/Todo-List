@@ -1,7 +1,7 @@
 import { ButtonPrimary } from "../simple/button";
 import { useNavigate, useLocation } from "react-router-dom";
 import Profile from '../simple/profile';
-import useTaskGroupModalRef from "../../hooks/useTaskGroupModalRef";
+import {useTaskGroupCreateModalRef} from '../../hooks/useTaskGroupModalRef';
 import useTaskGroup from "../../hooks/useTaskGroup";
 import useAppData from "../../hooks/useAppData";
 function Header() {
@@ -9,7 +9,7 @@ function Header() {
     const navigate = useNavigate();
     const { pathname } = useLocation();
     const {currentTaskGroup} = useTaskGroup()
-    const taskGropuCreateRef = useTaskGroupModalRef();
+    const taskGropuCreateRef = useTaskGroupCreateModalRef();
 
     const isHomeRoute = pathname === '/Home';
     const isTaskRoute = pathname === '/Task';

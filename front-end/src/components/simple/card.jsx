@@ -1,11 +1,14 @@
 import { DataContext } from "../../context/DataContext";
 import { useContext } from "react";
+
+import { useTaskGroupDeleteModalRef } from "../../hooks/useTaskGroupModalRef";
+
 function Card({data, handleTaskPage}) {
   const {card, completed, current, id} = data;
   const {title, date, theme} = card;
 
-  const {deleteTaskGroup} = useContext(DataContext)
-
+  const taskCategoryDeleteRef = useTaskGroupDeleteModalRef()
+  const {setCurrentGroupToBeDeletedId} = useContext(DataContext);
   return (
     <div className='card' style = {{backgroundColor : theme}}>
       <span className = 'card-upper'>
@@ -19,7 +22,10 @@ function Card({data, handleTaskPage}) {
           </span>
         </span>
         <span className = "card-options">
-          <i className = 'fa-solid fa-trash' onClick = {() => deleteTaskGroup(id)}/>
+          <i className = 'fa-solid fa-trash' onClick = {() => {
+            setCurrentGroupToBeDeletedId(id);
+            taskCategoryDeleteRef.current.showModal()
+          }}/>
         </span>
       </span>
       <span className = "card-task-info">

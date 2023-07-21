@@ -5,7 +5,8 @@ import App from './App.jsx'
 import { BrowserRouter } from 'react-router-dom'
 import { DataProvider } from './context/DataContext.jsx';
 
-import { TaskCategoryCreate } from './components/simple/dailogModel.jsx';
+import TaskGroupDeleteModal from './components/simple/taskGroupDeleteModal.jsx';
+import TaskGroupCreateModal from './components/simple/taskGroupCreateModal.jsx';
 
 import './stylesheet/index.css';
 
@@ -15,7 +16,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       <DataProvider>
         <>
           <App />
-          <TaskCategoryCreate />
+          <TaskGroupCreateModal />
+          <TaskGroupDeleteModal />
         </>
       </DataProvider>
     </BrowserRouter>

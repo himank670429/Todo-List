@@ -25,10 +25,10 @@ function TaskTabs() {
       </div>
       <div style = {{backgroundColor : color}} className='tab-content'>
         {activeTab === "completed" && currentTaskGroup.completed.map((item, index) => {
-          return <ComletedTask key = {item.id} desc = {item.desc} id = {item.id}/>
+          return <ComletedTask key = {item._id} desc = {item.desc} id = {item._id}/>
         })}
         {activeTab === "current" && currentTaskGroup.current.map((item, index) => {
-          return <CurrentTask key = {item.id} desc = {item.desc} id = {item.id}/>
+          return <CurrentTask key = {item._id} desc = {item.desc} id = {item._id}/>
         })}
       </div>
     </div>

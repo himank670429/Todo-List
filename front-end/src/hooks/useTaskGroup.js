@@ -9,7 +9,7 @@ function useTaskGroup() {
         deleteCurrentTask, 
         deleteCompletedTask, 
         markTaskAsDone,
-        markTaskAsNoteDone
+        markTaskAsNoteDone,
     } = useContext(DataContext);
 
     const data =  appData.tasks[currentGroupIndex]

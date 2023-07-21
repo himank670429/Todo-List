@@ -45,6 +45,7 @@
 
 .modal {
   border: none;
+  outline: none;
   border-radius: 2.4rem;
   position: absolute;
   top: 50%;
@@ -84,6 +85,9 @@
   flex-direction: column;
   padding-inline: 1rem;
 }
+.modal .modal-container .modal-section .modal-container-thumbnail {
+  border-radius: 1rem;
+}
 .modal .modal-container .modal-section .modal-container-label {
   color: #4B4B4B;
   font-size: 13px;
@@ -97,8 +101,14 @@
   box-shadow: none;
 }
 .modal .modal-container .modal-section .modal-container-note {
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 600;
+  margin-inline: 0.6rem;
+  margin-block: 0.7rem 2rem;
+  color: #969696;
+}
+.modal .modal-container .modal-section .modal-container-message {
+  font-size: 16px;
   margin-inline: 0.6rem;
   margin-block: 0.7rem 2rem;
   color: #969696;
