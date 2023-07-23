@@ -6,7 +6,7 @@ function NotfoundPage() {
         setTimeout(() => {
             navigate('/Home')
         }, 10_000);
-    }, [])
+    }, [navigate])
     return (
     <div>Notfound</div>
     )

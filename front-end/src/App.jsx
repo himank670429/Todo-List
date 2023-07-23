@@ -1,21 +1,27 @@
-import {Routes, Route, useNavigate} from 'react-router-dom';
+import {Routes, Route} from 'react-router-dom';
 
+import NotFoundPage from './pages/NotfoundPage';
+import LoadingPage from './pages/LoadingPage';
+import LoginPage from './pages/LoginPage';
+
+import { GoogleOAuthProvider } from '@react-oauth/google';
+import useAppData from './hooks/useAppData';
 import HomePage from './pages/HomePage';
 import TaskPage from './pages/TaskPage';
-import NotFoundPage from './pages/NotfoundPage';
 import AboutUsPage from './pages/AboutUsPage';
 import TermsPage from './pages/TermsPage';
 import PrivacyPage from './pages/PrivacyPage';
-import LoadingPage from './pages/LoadingPage';
-
 import { useRedirect } from './hooks/useRedirect';
-import useAppData from './hooks/useAppData';
 
 function App() {
   const {data} = useAppData();
   return (
+    <GoogleOAuthProvider clientId = {process.env.REACT_APP_CLIENT_ID}>
     <Routes>
       <Route path = '/' element = {<LoadingPage />}/>
+      <Route path = '/login' element = {<LoginPage />}>
+        <Route path = ':id'/>
+      </Route>
       <Route path = '/Home' element = {useRedirect(data, <HomePage />, '/')}/>
       <Route path = '/Task' element = {useRedirect(data, <TaskPage />, '/')}/> 
       <Route path = '/About' element = {useRedirect(data, <AboutUsPage />, '/')}/> 
@@ -23,6 +29,7 @@ function App() {
       <Route path = '/Privacy' element = {useRedirect(data, <PrivacyPage />, '/')} />
       <Route path = '*' element = {<NotFoundPage />} />
     </Routes>
+    </GoogleOAuthProvider>
   )
 }
 

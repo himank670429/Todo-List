@@ -1,10 +1,14 @@
-import Header from "../components/container/Header"
 import Footer from "../components/container/Footer"
 import TermsContent from "../assets/terms"
 function TosPage() {
 return (
 <>
-    <Header />
+    <div className="header">
+        <span className = "header-item logo">
+            <span data-color = "blue">Terms &nbsp;</span>
+            <span>and Conditions Page</span>
+        </span>
+    </div>
     <div className="main tos">
         <TermsContent />
     </div>

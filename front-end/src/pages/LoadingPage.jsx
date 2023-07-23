@@ -7,7 +7,7 @@ function LoadingPage() {
     useEffect(() => {
         if (data){
             console.log(data)
-            navigate('/Home')
+            navigate('/login')
         }
     }, [data, navigate])
     return (

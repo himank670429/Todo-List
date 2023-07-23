@@ -1,4 +1,4 @@
-export default function useDate(){
+export default function getDate(){
     const date = new Date()
     return {
         sec : date.getSeconds(),

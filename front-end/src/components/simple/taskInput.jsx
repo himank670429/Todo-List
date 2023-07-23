@@ -1,9 +1,9 @@
 import { useState } from "react";
 import useTaskGroup from '../../hooks/useTaskGroup';
 import { rgbToHex, hexToRgb, darken } from "../../helper/color";
-import useDate from "../../hooks/useDate";
+import getDate from "../../helper/getDate";
 function TaskInput() {
-    const {day, month, year} = useDate()
+    const {day, month, year} = getDate()
     const {currentTaskGroup, addCurrentTask} = useTaskGroup();
     const color = currentTaskGroup.card.theme;
     const darkColor = rgbToHex(...darken(hexToRgb(color), 0.4))

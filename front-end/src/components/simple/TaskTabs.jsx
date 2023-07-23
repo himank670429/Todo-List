@@ -1,15 +1,17 @@
 import { useState } from "react";
-import useTaskGroup from "../../hooks/useTaskGroup"
 import {CurrentTask, ComletedTask} from "./Task";
 import { rgbToHex, hexToRgb, darken } from "../../helper/color";
 import TaskInput from "./taskInput";
+import { DataContext } from "../../context/DataContext";
+import { useContext } from "react";
 function TaskTabs() {
-  const {currentTaskGroup} = useTaskGroup();
+  const {currentGroupIndex, appData} = useContext(DataContext);
+  const currentTaskGroup = appData.tasks[currentGroupIndex]
   const color = currentTaskGroup.card.theme;
 
   const [activeTab, setActiveTab] = useState('current');
   const darkColor = rgbToHex(...darken(hexToRgb(color), 0.4))
-
+  console.log(currentTaskGroup)
   return (
     <>
     <div className = 'tab-container'>

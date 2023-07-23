@@ -12,12 +12,10 @@ function useTaskGroup() {
         markTaskAsNoteDone,
     } = useContext(DataContext);
 
-    const data =  appData.tasks[currentGroupIndex]
-    const [currentTaskGroup, setCurrentTaskGroup] = useState((currentGroupIndex === null) ? null : data)
-
+    const [currentTaskGroup, setCurrentTaskGroup] = useState(currentGroupIndex !== null ? appData.tasks[currentGroupIndex] : null)
     useEffect(() => {
         setCurrentTaskGroup((prev) => appData.tasks[currentGroupIndex])
-    }, [currentGroupIndex])
+    }, [currentGroupIndex,appData.tasks])
 
     return { 
         currentTaskGroup, 

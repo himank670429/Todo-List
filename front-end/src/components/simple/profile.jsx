@@ -6,7 +6,7 @@ function Profile() {
     const [shown, setShown] = useState(false);
     return (
     <div className = "dropdown">
-        <img className = "avatar" src = {avatar ?? "/avatar/default.png"} onClick={() => setShown(prev => !prev)}/>
+        <img className = "avatar" src = {avatar ?? "/avatar/default.png"} onClick={() => setShown(prev => !prev)} alt = "avatar"/>
         <div className = {`dropdown-content ${(shown) ? 'show' : ""}`}>
             <Link className="dropdown-content-item">{username}</Link>
             <hr />

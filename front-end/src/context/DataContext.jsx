@@ -1,13 +1,14 @@
+import getDate from "../helper/getDate";
+import { getUserData, addTaskGroupfetch, deleteTaskGroupfetch,addTask,deleteTask,markTask} from "../api/apiData";
 import { useState, useEffect, createContext, useRef } from "react";
 export const DataContext = createContext();
-import { getUserData } from "../api/apiData";
-import useDate from "../hooks/useDate";
+
 export function DataProvider({children}){
     const [appData, setAppData] = useState(null)
     
     useEffect(() => {
         getUserData()
-        .then(data => {setAppData(data)})
+        .then(data => {console.log(data); setAppData(data)})
     }, [])
     
     const [currentGroupIndex, setCurrentGroupIndex] = useState(null);
@@ -18,91 +19,79 @@ export function DataProvider({children}){
         function addZeroes(num){
             return String(num).padStart(2, '0');
         }
-        const {day, month, year} = useDate();
-        setAppData(prev => {
-            const date_string = `${addZeroes(day)}/${addZeroes(month)}/${addZeroes(year)}`
-            const newEntry = {
-                id : prev.tasks.length ?? 0,
-                card : {
-                    title : category,
-                    date : date_string,
-                    theme : hexValue,
-                },
-                completed : [], 
-                current : []
-            }
+        const {day, month, year} = getDate();
+        const date_string = `${addZeroes(day)}/${addZeroes(month)}/${addZeroes(year)}`
 
+        addTaskGroupfetch(category, hexValue, date_string)
+        .then(data => setAppData(prev => {
             const updated_value = {...prev}
-            updated_value.tasks.push(newEntry)
-            return updated_value
-        })
+            updated_value.tasks = data
+            return updated_value;
+        }))
     }   
 
-    function deleteTaskGroup(id){
-        setAppData(prev => {
+    function deleteTaskGroup(){
+        deleteTaskGroupfetch(currentGroupToBeDeletedId)
+        .then(data => {
+            setAppData(prev => {
             const updated_value = {...prev}
-            updated_value.tasks = updated_value.tasks.filter(item => item.id !== id)
+            updated_value.tasks = data
             return updated_value
-        })
+        })})
     }
 
     function addCurrentTask(desc, date){
-        setAppData(prev => {
+        addTask(currentGroupIndex, desc, date)
+        .then(data => setAppData(prev => {
             const updated_value = {...prev}
-            updated_value.tasks[currentGroupIndex].current.push({
-                _id : crypto.randomUUID(),
-                desc,
-                date,
-            })
+            updated_value.tasks[currentGroupIndex].current = data
             return updated_value
-        })
+        }))
     }
 
     function deleteCompletedTask(id){
-        setAppData(prev => {
-            const updated_value = {...prev}
-            updated_value.tasks[currentGroupIndex].completed = updated_value.tasks[currentGroupIndex].completed.filter(item => item._id !==id)
-            return updated_value
+        deleteTask(currentGroupIndex, id, false)
+        .then(data => {
+            setAppData(prev => {
+                const updated_value = {...prev}
+                updated_value.tasks[currentGroupIndex].completed = data
+                return updated_value
+            })
         })
     }
-
+    
     function deleteCurrentTask(id){
-        setAppData(prev => {
-            const updated_value = {...prev}
-            updated_value.tasks[currentGroupIndex].current = updated_value.tasks[currentGroupIndex].current.filter(item => item._id !==id)
-            return updated_value
+        deleteTask(currentGroupIndex, id, true)
+        .then(data => {
+            console.log(data)
+            setAppData(prev => {
+                const updated_value = {...prev}
+                updated_value.tasks[currentGroupIndex].current = data
+                return updated_value
+            })
         })
     }
 
     function markTaskAsDone(id){
-        setAppData(prev => {
-            const updated_value = {...prev}
-            let taskToBeDone;
-            updated_value.tasks[currentGroupIndex].current.forEach(item => {
-                if (item._id === id)
-                    taskToBeDone = item
-            });
-
-            if (taskToBeDone === undefined) return prev
-            updated_value.tasks[currentGroupIndex].current = updated_value.tasks[currentGroupIndex].current.filter(item => item._id !==id)
-            updated_value.tasks[currentGroupIndex].completed.push(taskToBeDone)
-            return updated_value
-        })
+        markTask(currentGroupIndex, id, true)
+        .then(data => {
+            setAppData(prev => {
+                const updated_value = {...prev}
+                updated_value.tasks[currentGroupIndex] = data;
+                return updated_value
+            })
+        })  
     }
 
     function markTaskAsNoteDone(id){
-        setAppData(prev => {
-            const updated_value = {...prev}
-            let taskToBeNoteDone;
-            updated_value.tasks[currentGroupIndex].completed.forEach(item => {
-                if (item._id === id)
-                    taskToBeNoteDone = item
-            });
-
-            if (taskToBeNoteDone === undefined) return prev
-            updated_value.tasks[currentGroupIndex].completed = updated_value.tasks[currentGroupIndex].completed.filter(item => item._id !==id)
-            updated_value.tasks[currentGroupIndex].current.push(taskToBeNoteDone)
-            return updated_value
+        markTask(currentGroupIndex, id, false)
+        .then(data => {
+            console.log(data)
+            setAppData(prev => {
+                const updated_value = {...prev}
+                updated_value.tasks[currentGroupIndex] = data;
+                return updated_value
+            })
         })
     }
 

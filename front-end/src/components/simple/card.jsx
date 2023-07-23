@@ -4,7 +4,7 @@ import { useContext } from "react";
 import { useTaskGroupDeleteModalRef } from "../../hooks/useTaskGroupModalRef";
 
 function Card({data, handleTaskPage}) {
-  const {card, completed, current, id} = data;
+  const {card, completed, current, _id} = data;
   const {title, date, theme} = card;
 
   const taskCategoryDeleteRef = useTaskGroupDeleteModalRef()
@@ -23,7 +23,7 @@ function Card({data, handleTaskPage}) {
         </span>
         <span className = "card-options">
           <i className = 'fa-solid fa-trash' onClick = {() => {
-            setCurrentGroupToBeDeletedId(id);
+            setCurrentGroupToBeDeletedId(_id);
             taskCategoryDeleteRef.current.showModal()
           }}/>
         </span>

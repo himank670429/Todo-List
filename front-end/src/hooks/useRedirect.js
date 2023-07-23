@@ -6,6 +6,6 @@ export function useRedirect (state, defaultMarkup, route){
         if (state === null || state === undefined){
             navigate(route)
         }
-    }, [state, navigate])
+    }, [state, navigate, route])
     return (state === null || state === undefined) ? null : defaultMarkup;
 }   

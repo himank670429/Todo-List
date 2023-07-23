@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 
 const taskSchema = new mongoose.Schema({
-    id: { type: String, required: true },
     desc: { type: String, required: true },
     date: { type: String, required: true },
 });
@@ -17,8 +16,9 @@ const taskGroupSchema = new mongoose.Schema({
 })
 
 const userDataSchema = new mongoose.Schema({
+    email : {type : String, required : true},
     username: { type: String, required: true },
-    avatar: { type: String, default: null },
+    avatar: { type: String},
     tasks: {type : [taskGroupSchema], default : []}
 }, {
     collection : 'UserData'
