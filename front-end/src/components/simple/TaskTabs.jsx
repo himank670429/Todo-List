@@ -11,7 +11,6 @@ function TaskTabs() {
 
   const [activeTab, setActiveTab] = useState('current');
   const darkColor = rgbToHex(...darken(hexToRgb(color), 0.4))
-  console.log(currentTaskGroup)
   return (
     <>
     <div className = 'tab-container'>

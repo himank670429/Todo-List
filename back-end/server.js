@@ -2,8 +2,7 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 const app = express();
-const port = process.env.PORT || 3000
-const jwt = require("jsonwebtoken")
+const port = process.env.PORT || 3001
 
 const mongoose = require('mongoose');
 mongoose.connect(process.env.DB_URI);

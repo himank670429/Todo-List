@@ -1,16 +1,32 @@
 import getDate from "../helper/getDate";
-import { getUserData, addTaskGroupfetch, deleteTaskGroupfetch,addTask,deleteTask,markTask} from "../api/apiData";
-import { useState, useEffect, createContext, useRef } from "react";
+import { login,  addTaskGroupfetch, deleteTaskGroupfetch,addTask,deleteTask,markTask} from "../api/apiData";
+import { useState, createContext, useRef, useEffect } from "react";
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import getCookie from "../helper/getCookie";
+
+// context
 export const DataContext = createContext();
 
-export function DataProvider({children}){
-    const [appData, setAppData] = useState(null)
-    
+function DataProvider({children}){
+    const navigate = useNavigate();    
     useEffect(() => {
-        getUserData()
-        .then(data => {console.log(data); setAppData(data)})
+        const access_token = getCookie('access-token');
+        console.log(access_token)
+        if (access_token){
+            const decodedValue = decodeURIComponent(access_token)
+            login(decodedValue)
+            .then(data => {
+                setAppData(data)
+                navigate('/Home')
+            })
+        }
+        else{
+            navigate('/Login')
+        }
     }, [])
-    
+
+    const [appData, setAppData] = useState(null)
     const [currentGroupIndex, setCurrentGroupIndex] = useState(null);
     
     const [currentGroupToBeDeletedId, setCurrentGroupToBeDeletedId] = useState(null);
@@ -22,7 +38,7 @@ export function DataProvider({children}){
         const {day, month, year} = getDate();
         const date_string = `${addZeroes(day)}/${addZeroes(month)}/${addZeroes(year)}`
 
-        addTaskGroupfetch(category, hexValue, date_string)
+        addTaskGroupfetch(appData._id, category, hexValue, date_string)
         .then(data => setAppData(prev => {
             const updated_value = {...prev}
             updated_value.tasks = data
@@ -31,7 +47,7 @@ export function DataProvider({children}){
     }   
 
     function deleteTaskGroup(){
-        deleteTaskGroupfetch(currentGroupToBeDeletedId)
+        deleteTaskGroupfetch(appData._id, currentGroupToBeDeletedId)
         .then(data => {
             setAppData(prev => {
             const updated_value = {...prev}
@@ -41,7 +57,7 @@ export function DataProvider({children}){
     }
 
     function addCurrentTask(desc, date){
-        addTask(currentGroupIndex, desc, date)
+        addTask(appData._id, currentGroupIndex, desc, date)
         .then(data => setAppData(prev => {
             const updated_value = {...prev}
             updated_value.tasks[currentGroupIndex].current = data
@@ -50,7 +66,7 @@ export function DataProvider({children}){
     }
 
     function deleteCompletedTask(id){
-        deleteTask(currentGroupIndex, id, false)
+        deleteTask(appData._id, currentGroupIndex, id, false)
         .then(data => {
             setAppData(prev => {
                 const updated_value = {...prev}
@@ -61,7 +77,7 @@ export function DataProvider({children}){
     }
     
     function deleteCurrentTask(id){
-        deleteTask(currentGroupIndex, id, true)
+        deleteTask(appData._id, currentGroupIndex, id, true)
         .then(data => {
             console.log(data)
             setAppData(prev => {
@@ -73,7 +89,7 @@ export function DataProvider({children}){
     }
 
     function markTaskAsDone(id){
-        markTask(currentGroupIndex, id, true)
+        markTask(appData._id, currentGroupIndex, id, true)
         .then(data => {
             setAppData(prev => {
                 const updated_value = {...prev}
@@ -84,7 +100,7 @@ export function DataProvider({children}){
     }
 
     function markTaskAsNoteDone(id){
-        markTask(currentGroupIndex, id, false)
+        markTask(appData._id, currentGroupIndex, id, false)
         .then(data => {
             console.log(data)
             setAppData(prev => {
@@ -117,8 +133,13 @@ export function DataProvider({children}){
         deleteCurrentTask,
         deleteCompletedTask,
         markTaskAsDone,
-        markTaskAsNoteDone
+        markTaskAsNoteDone,
+
     }}>
         {children}
     </DataContext.Provider>
 }
+
+const MemoizedDataProvider = React.memo(DataProvider);
+
+export default MemoizedDataProvider;

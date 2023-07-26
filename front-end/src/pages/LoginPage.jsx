@@ -3,16 +3,20 @@ import {Link, useNavigate} from 'react-router-dom';
 import { useGoogleLogin } from '@react-oauth/google';
 import { login } from '../api/apiData';
 import useAppData from '../hooks/useAppData';
+import setCookie from '../helper/setCookie';
 function LoginPage() {
   const {update} = useAppData();
   const navigate = useNavigate();
   const googleLogin = useGoogleLogin({
-    onSuccess: async response => {
-      const data = await login(response.access_token)
+    onSuccess: async (response) => {
+      const {access_token} = response;
+      const data = await login(access_token)
+      setCookie('access-token', access_token, 14)
       update(data)
       navigate('/Home')
     }
   });
+
   return (
     <>
       <div className = 'login'>
@@ -36,9 +40,7 @@ function LoginPage() {
       </div>
       <div className="bottom">
         <Link to = '/Terms'>Terms and condition</Link>
-        <span>
-          |
-        </span>
+        <span>|</span>
         <Link to = '/Privacy'>Privacy Policy</Link>
       </div>
     </>

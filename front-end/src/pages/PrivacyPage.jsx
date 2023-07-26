@@ -5,8 +5,7 @@ function PrivacyPage() {
     <>
         <div className="header">
           <span className= "header-item logo">
-            <span data-color = 'blue'>Pricay&nbsp;</span>
-            <span >Policy Page </span>
+            <span>Pricay Policy</span>
           </span>
         </div>
         <div className="main">

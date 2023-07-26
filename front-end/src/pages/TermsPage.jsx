@@ -5,8 +5,7 @@ return (
 <>
     <div className="header">
         <span className = "header-item logo">
-            <span data-color = "blue">Terms &nbsp;</span>
-            <span>and Conditions Page</span>
+            <span>Terms and Conditions</span>
         </span>
     </div>
     <div className="main tos">

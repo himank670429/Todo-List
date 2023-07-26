@@ -2,7 +2,6 @@ function Terms() {
   return (
     <div className = 'terms'>
       <div className="section">
-        <h1>Terms and Conditions</h1>
         <p>Last updated: July 20, 2023</p>
         <p>Please read these terms and conditions carefully before using Our Service.</p>
       </div>

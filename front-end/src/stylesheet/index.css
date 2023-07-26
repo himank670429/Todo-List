@@ -320,7 +320,7 @@
 
 .avatar {
   width: 2rem;
-  border: 0.15em solid #969696;
+  border: 0.15em solid #D9D9D9;
   border-radius: 50%;
   background-color: #D9D9D9;
   cursor: pointer;
@@ -351,7 +351,6 @@
 }
 
 .dropdown-content-item {
-  display: block;
   padding: 0.7rem 0.4rem;
   margin: 0.3rem;
   display: flex;
@@ -376,6 +375,7 @@
 
 .show {
   display: block;
+  width: fit-content;
 }
 
 .indicator-large {
