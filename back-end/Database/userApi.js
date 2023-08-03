@@ -8,5 +8,8 @@ module.exports = {
         }
         const options = {upsert : true, new : true, setDefaultsOnInsert : true}
         return userData.findOneAndUpdate({email}, newUser, options)
+    },
+    findUser : async (email) => {
+        return await userData.findOne({email});
     }
 }

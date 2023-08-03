@@ -1,8 +1,8 @@
 import { baseUrl } from "./config";
 import axios from 'axios';
-export async function addTaskGroupfetch(userId, title, theme, date){
+export async function addTaskGroupfetch(id, title, theme, date){
     const res = await axios.post(`${baseUrl}/api/user/taskGroup/add`, {
-        userId,
+        id,
         title, 
         theme, 
         date
@@ -10,17 +10,17 @@ export async function addTaskGroupfetch(userId, title, theme, date){
     return res.data;
 }
 
-export async function deleteTaskGroupfetch(userId, taskGroupId){
+export async function deleteTaskGroupfetch(id, taskGroupId){
     const res = await axios.delete(`${baseUrl}/api/user/taskGroup/del`, {data :{
-        userId,
+        id,
         taskGroupId
     }})
     return res.data;
 }
 
-export async function addTask(userId, taskGroupIndex, desc, date){
+export async function addTask(id, taskGroupIndex, desc, date){
     const res = await axios.post(`${baseUrl}/api/user/task/add`, {
-        userId,
+        id,
         taskGroupIndex, 
         desc, 
         date
@@ -28,18 +28,18 @@ export async function addTask(userId, taskGroupIndex, desc, date){
     return res.data;
 }
 
-export async function deleteTask(userId, taskGroupIndex, taskId, isCurrent){
+export async function deleteTask(id, taskGroupIndex, taskId, isCurrent){
     const res = await axios.delete(`${baseUrl}/api/user/task/del`, {data : {
-        userId,
+        id,
         taskGroupIndex,
         taskId,
         isCurrent,
     }})
     return res.data;
 }
-export async function markTask(userId, taskGroupIndex, taskId, isCurrent){
+export async function markTask(id, taskGroupIndex, taskId, isCurrent){
     const res = await axios.put(`${baseUrl}/api/user/task/mark`, {
-        userId,
+        id,
         taskGroupIndex,
         taskId,
         isCurrent,

@@ -9,9 +9,9 @@ function LoginPage() {
   const navigate = useNavigate();
   const googleLogin = useGoogleLogin({
     onSuccess: async (response) => {
-      const {access_token} = response;
+      const {access_token, expires_in} = response;
       const data = await login(access_token)
-      setCookie('access-token', access_token, 14)
+      setCookie('access-token', access_token, expires_in)
       update(data)
       navigate('/Home')
     }

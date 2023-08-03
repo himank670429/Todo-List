@@ -3,9 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import Profile from '../simple/profile';
 import {useTaskGroupCreateModalRef} from '../../hooks/useTaskGroupModalRef';
 import useTaskGroup from "../../hooks/useTaskGroup";
-import useAppData from "../../hooks/useAppData";
 function Header() {
-    const {data} = useAppData();
     const navigate = useNavigate();
     const { pathname } = useLocation();
     const {currentTaskGroup} = useTaskGroup()
@@ -41,7 +39,6 @@ function Header() {
                 text = "back to home page"
                 icon = {<i className="fa-solid fa-circle-left"></i>}
                 eventHandler={() => {
-                    console.log(data)
                     navigate('/Home')
                 }}
             />
@@ -57,7 +54,6 @@ function Header() {
                 text = "back to home page"
                 icon = {<i className="fa-solid fa-circle-left"></i>}
                 eventHandler={() => {
-                    console.log(data)
                     navigate('/Home')
                 }}
             />

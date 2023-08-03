@@ -4,31 +4,31 @@ import { useState, createContext, useRef, useEffect } from "react";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import getCookie from "../helper/getCookie";
-
+import { useLocation } from "react-router-dom";
 // context
 export const DataContext = createContext();
 
 function DataProvider({children}){
+    const {pathname} = useLocation();
     const navigate = useNavigate();    
     useEffect(() => {
-        const access_token = getCookie('access-token');
-        console.log(access_token)
-        if (access_token){
-            const decodedValue = decodeURIComponent(access_token)
-            login(decodedValue)
-            .then(data => {
-                setAppData(data)
-                navigate('/Home')
-            })
+        if (pathname === '/Login' || pathname === '/'){
+            const access_token = getCookie('access-token');
+            if (access_token){
+                const decodedValue = decodeURIComponent(access_token)
+                login(decodedValue)
+                .then(data => {
+                    setAppData(data)
+                    navigate('/Home')
+                })
+            }
+            else{
+                navigate('/Login')
+            }
         }
-        else{
-            navigate('/Login')
-        }
-    }, [])
-
+    }, [navigate, pathname])
     const [appData, setAppData] = useState(null)
     const [currentGroupIndex, setCurrentGroupIndex] = useState(null);
-    
     const [currentGroupToBeDeletedId, setCurrentGroupToBeDeletedId] = useState(null);
 
     function addTaskGroup(category, hexValue){
@@ -37,8 +37,7 @@ function DataProvider({children}){
         }
         const {day, month, year} = getDate();
         const date_string = `${addZeroes(day)}/${addZeroes(month)}/${addZeroes(year)}`
-
-        addTaskGroupfetch(appData._id, category, hexValue, date_string)
+        addTaskGroupfetch(appData.email, category, hexValue, date_string)
         .then(data => setAppData(prev => {
             const updated_value = {...prev}
             updated_value.tasks = data
@@ -47,7 +46,7 @@ function DataProvider({children}){
     }   
 
     function deleteTaskGroup(){
-        deleteTaskGroupfetch(appData._id, currentGroupToBeDeletedId)
+        deleteTaskGroupfetch(appData.email, currentGroupToBeDeletedId)
         .then(data => {
             setAppData(prev => {
             const updated_value = {...prev}
@@ -57,7 +56,7 @@ function DataProvider({children}){
     }
 
     function addCurrentTask(desc, date){
-        addTask(appData._id, currentGroupIndex, desc, date)
+        addTask(appData.email, currentGroupIndex, desc, date)
         .then(data => setAppData(prev => {
             const updated_value = {...prev}
             updated_value.tasks[currentGroupIndex].current = data
@@ -65,8 +64,8 @@ function DataProvider({children}){
         }))
     }
 
-    function deleteCompletedTask(id){
-        deleteTask(appData._id, currentGroupIndex, id, false)
+    function deleteCompletedTask(taskid){
+        deleteTask(appData.email, currentGroupIndex, taskid, false)
         .then(data => {
             setAppData(prev => {
                 const updated_value = {...prev}
@@ -76,10 +75,9 @@ function DataProvider({children}){
         })
     }
     
-    function deleteCurrentTask(id){
-        deleteTask(appData._id, currentGroupIndex, id, true)
+    function deleteCurrentTask(taskid){
+        deleteTask(appData.email, currentGroupIndex, taskid, true)
         .then(data => {
-            console.log(data)
             setAppData(prev => {
                 const updated_value = {...prev}
                 updated_value.tasks[currentGroupIndex].current = data
@@ -88,8 +86,8 @@ function DataProvider({children}){
         })
     }
 
-    function markTaskAsDone(id){
-        markTask(appData._id, currentGroupIndex, id, true)
+    function markTaskAsDone(taskid){
+        markTask(appData.email, currentGroupIndex, taskid, true)
         .then(data => {
             setAppData(prev => {
                 const updated_value = {...prev}
@@ -99,10 +97,9 @@ function DataProvider({children}){
         })  
     }
 
-    function markTaskAsNoteDone(id){
-        markTask(appData._id, currentGroupIndex, id, false)
+    function markTaskAsNoteDone(taskid){
+        markTask(appData.email, currentGroupIndex, taskid, false)
         .then(data => {
-            console.log(data)
             setAppData(prev => {
                 const updated_value = {...prev}
                 updated_value.tasks[currentGroupIndex] = data;

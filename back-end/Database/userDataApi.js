@@ -1,11 +1,7 @@
 const UserData = require('../Schemas/userData')
 
 module.exports = {
-    getUserData : async (id) => {
-        return await UserData.findById(id);
-    },
-    addTaskGroup : async (userId, title, theme, date) =>{
-        const userInstance = await UserData.findById(userId);
+    addTaskGroup : async (userInstance, title, theme, date) =>{
         userInstance.tasks.push({
             card: {
                 title,
@@ -18,22 +14,17 @@ module.exports = {
         await userInstance.save()
         return userInstance.tasks;
     },
-    deleteTaskGroup : async (userId, taskGroupId) => {
-        const userInstance = await UserData.findById(userId);
+    deleteTaskGroup : async (userInstance, taskGroupId) => {
         userInstance.tasks = userInstance.tasks.filter(item => item.id !== taskGroupId)
         await userInstance.save();
         return userInstance.tasks;
     },
-
-    addTask : async (userId, taskGroupIndex, desc, date) => {
-        const userInstance = await UserData.findById(userId);
+    addTask : async (userInstance, taskGroupIndex, desc, date) => {
         userInstance.tasks[taskGroupIndex].current.push({desc, date})
         await userInstance.save();
         return userInstance.tasks[taskGroupIndex].current;
     },
-
-    deleteTask : async (userId, taskGroupIndex, taskId, isCurrentTask) => {
-        const userInstance = await UserData.findById(userId);
+    deleteTask : async (userInstance, taskGroupIndex, taskId, isCurrentTask) => {
         if (isCurrentTask){
             userInstance.tasks[taskGroupIndex].current = userInstance.tasks[taskGroupIndex].current.filter(item => item.id !== taskId)
             await userInstance.save();
@@ -45,9 +36,7 @@ module.exports = {
             return userInstance.tasks[taskGroupIndex].completed;
         }
     },
-
-    markTask : async (userId, taskGroupIndex, taskId, isCurrentTask) => {
-        const userInstance = await UserData.findById(userId);
+    markTask : async (userInstance, taskGroupIndex, taskId, isCurrentTask) => {
         let taskToBeMarked;
         if (isCurrentTask){
             userInstance.tasks[taskGroupIndex].current.forEach(item => {

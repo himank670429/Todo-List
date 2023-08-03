@@ -8,7 +8,11 @@ function Profile() {
     const [shown, setShown] = useState(false);
     return (
     <div className = "dropdown">
-        <img className = "avatar" src = {avatar ?? "/avatar/default.png"} onClick={() => setShown(prev => !prev)} alt = "avatar"/>
+        <img className = "avatar" 
+        src = {avatar ?? "/avatar/default.png"} 
+        onClick={() => setShown(prev => !prev)} alt = "avatar"
+        onError={(e) => e.target.src = '/avatar/default.png'}
+        />
         <div className = {`dropdown-content ${(shown) ? 'show' : ""}`}>
             <span className="dropdown-content-item">{username}</span>
             <hr />
