@@ -1,4 +1,4 @@
-const userData = require('../Schemas/userData')
+const userData = require('../../model/Schemas/userData')
 module.exports = {
     upSertUser : async (email, username, avatar) => {
         const newUser = {

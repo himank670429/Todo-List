@@ -41,6 +41,7 @@
 }
 .footer .footer-link {
   color: #0277FF;
+  cursor: pointer;
 }
 
 .modal {

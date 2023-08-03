@@ -1,19 +1,22 @@
 import {ButtonPrimary} from '../components/simple/button'
 import {Link, useNavigate} from 'react-router-dom';
 import { useGoogleLogin } from '@react-oauth/google';
-import { login } from '../api/apiData';
-import useAppData from '../hooks/useAppData';
+import { DataContext } from '../context/DataContext';
+import { useContext } from 'react';
 import setCookie from '../helper/setCookie';
 function LoginPage() {
-  const {update} = useAppData();
-  const navigate = useNavigate();
+  const navigate = useNavigate(); 
+  const {login, setAppData} = useContext(DataContext);
+
   const googleLogin = useGoogleLogin({
     onSuccess: async (response) => {
       const {access_token, expires_in} = response;
-      const data = await login(access_token)
-      setCookie('access-token', access_token, expires_in)
-      update(data)
-      navigate('/Home')
+      login(access_token)
+      .then(data => {
+        setAppData(data)
+        setCookie('access-token', access_token, expires_in)
+        navigate('/Home')
+      })
     }
   });
 

@@ -1,4 +1,4 @@
-const UserData = require('../Schemas/userData')
+const UserData = require('../../model/Schemas/userData')
 
 module.exports = {
     addTaskGroup : async (userInstance, title, theme, date) =>{

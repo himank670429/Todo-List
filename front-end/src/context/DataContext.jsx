@@ -1,14 +1,15 @@
 import getDate from "../helper/getDate";
-import { login,  addTaskGroupfetch, deleteTaskGroupfetch,addTask,deleteTask,markTask} from "../api/apiData";
 import { useState, createContext, useRef, useEffect } from "react";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import getCookie from "../helper/getCookie";
 import { useLocation } from "react-router-dom";
-// context
+import io from 'socket.io-client';
+import axios from 'axios';
 export const DataContext = createContext();
 
 function DataProvider({children}){
+    const [socket, setSocket] = useState(io.connect(process.env.REACT_APP_SERVER_URL))
     const {pathname} = useLocation();
     const navigate = useNavigate();    
     useEffect(() => {
@@ -26,47 +27,72 @@ function DataProvider({children}){
                 navigate('/Login')
             }
         }
-    }, [navigate, pathname])
+    }, [navigate, pathname, socket])
+
+
     const [appData, setAppData] = useState(null)
     const [currentGroupIndex, setCurrentGroupIndex] = useState(null);
     const [currentGroupToBeDeletedId, setCurrentGroupToBeDeletedId] = useState(null);
 
+    async function login(access_token){
+        const res = await axios.post(`${process.env.REACT_APP_SERVER_URL}/api/login/google`, {access_token})
+        return res.data
+    }
+    // app operation 
     function addTaskGroup(category, hexValue){
         function addZeroes(num){
             return String(num).padStart(2, '0');
         }
         const {day, month, year} = getDate();
         const date_string = `${addZeroes(day)}/${addZeroes(month)}/${addZeroes(year)}`
-        addTaskGroupfetch(appData.email, category, hexValue, date_string)
-        .then(data => setAppData(prev => {
-            const updated_value = {...prev}
-            updated_value.tasks = data
-            return updated_value;
-        }))
+        
+        socket.emit('api-user-taskGroup-add', appData.email, category, hexValue, date_string, (data, error) => {
+            if (error){
+                console.log(error)
+                return
+            }
+            setAppData(prev => {
+                const updated_value = {...prev}
+                updated_value.tasks = data
+                return updated_value;
+            })
+        })
     }   
 
     function deleteTaskGroup(){
-        deleteTaskGroupfetch(appData.email, currentGroupToBeDeletedId)
-        .then(data => {
+        socket.emit('api-user-taskGroup-del', appData.email, currentGroupToBeDeletedId, (data, error) => {
+            if (error){
+                console.log(error)
+                return
+            }
             setAppData(prev => {
-            const updated_value = {...prev}
-            updated_value.tasks = data
-            return updated_value
-        })})
+                const updated_value = {...prev}
+                updated_value.tasks = data
+                return updated_value
+            })
+        })
     }
 
     function addCurrentTask(desc, date){
-        addTask(appData.email, currentGroupIndex, desc, date)
-        .then(data => setAppData(prev => {
-            const updated_value = {...prev}
-            updated_value.tasks[currentGroupIndex].current = data
-            return updated_value
-        }))
+        socket.emit('api-user-task-add', appData.email, currentGroupIndex, desc, date, (data, error) => {
+            if (error){
+                console.log(error)
+                return
+            }
+            setAppData(prev => {
+                const updated_value = {...prev}
+                updated_value.tasks[currentGroupIndex].current = data
+                return updated_value
+            })
+        })
     }
 
     function deleteCompletedTask(taskid){
-        deleteTask(appData.email, currentGroupIndex, taskid, false)
-        .then(data => {
+        socket.emit('api-user-task-del', appData.email, currentGroupIndex, taskid, false, (data, error) => {
+            if (error){
+                console.log(error)
+                return
+            }
             setAppData(prev => {
                 const updated_value = {...prev}
                 updated_value.tasks[currentGroupIndex].completed = data
@@ -76,8 +102,11 @@ function DataProvider({children}){
     }
     
     function deleteCurrentTask(taskid){
-        deleteTask(appData.email, currentGroupIndex, taskid, true)
-        .then(data => {
+        socket.emit('api-user-task-del', appData.email, currentGroupIndex, taskid, true, (data, error) => {
+            if (error){
+                console.log(error)
+                return
+            }
             setAppData(prev => {
                 const updated_value = {...prev}
                 updated_value.tasks[currentGroupIndex].current = data
@@ -87,25 +116,31 @@ function DataProvider({children}){
     }
 
     function markTaskAsDone(taskid){
-        markTask(appData.email, currentGroupIndex, taskid, true)
-        .then(data => {
+        socket.emit('api-user-task-mark', appData.email, currentGroupIndex, taskid, true, (data, error) => {
+            if (error){
+                console.log(error)
+                return
+            }
             setAppData(prev => {
                 const updated_value = {...prev}
-                updated_value.tasks[currentGroupIndex] = data;
+                updated_value.tasks[currentGroupIndex] = data
                 return updated_value
             })
-        })  
+        }) 
     }
 
     function markTaskAsNoteDone(taskid){
-        markTask(appData.email, currentGroupIndex, taskid, false)
-        .then(data => {
+        socket.emit('api-user-task-mark', appData.email, currentGroupIndex, taskid, false, (data, error) => {
+            if (error){
+                console.log(error)
+                return
+            }
             setAppData(prev => {
                 const updated_value = {...prev}
-                updated_value.tasks[currentGroupIndex] = data;
+                updated_value.tasks[currentGroupIndex] = data
                 return updated_value
             })
-        })
+        }) 
     }
 
     const taskCategoryCreateRef = useRef();
@@ -132,6 +167,8 @@ function DataProvider({children}){
         markTaskAsDone,
         markTaskAsNoteDone,
 
+        login,
+        socket,
     }}>
         {children}
     </DataContext.Provider>
