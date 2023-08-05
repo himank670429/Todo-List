@@ -7,6 +7,7 @@ const http = require('http')
 const {Server} = require('socket.io')
 const mongoose = require('mongoose');
 mongoose.connect(process.env.DB_URI);
+const path = require('path')
 
 // local libraries
 const {
@@ -21,10 +22,18 @@ const {upSertUser, findUser} = require('./controller/Database/userApi')
 
 const {getGoogleUser} = require("./controller/auth/googleAuth");
 
-const {getCache, setCache} = require('./controller/cache/localCache');
+const {
+    getCache, 
+    setCache, 
+    getCacheData,    
+    addSocketInstance,
+    getSocketInstances,
+    removeSocketInstance
+} = require('./controller/cache/localCache');
 
 // setups 
 app.use(express.json())
+app.use(express.static('public'))
 app.use(cors({
     origin : require('./model/config/allowedOrigins')
 }))
@@ -49,11 +58,21 @@ const getOrsetCache = async (key, callback) => {
 
 // server
 io.on('connection', socket => {
+    socket.on('api-user-connect', async (id) => {
+        await getOrsetCache(id, async () => await findUser(id))
+        addSocketInstance(id, socket.id)
+        io.emit('get-local-cache', getCacheData())
+    })
     socket.on('api-user-taskGroup-add', async (id, title, theme, date, cb) => {
         const user = await getOrsetCache(id, async () => await findUser(id))
         try{
             const data = await addTaskGroup(user, title, theme, date)
-            cb(data, null)
+            cb(data.tasks, null)
+            const all_sockets = getSocketInstances(id)
+            all_sockets.forEach(socket_id => {
+                if (socket_id === socket.id) return
+                io.to(socket_id).emit('api-user-update-instance', data.tasks, 'taskGroup-add')
+            })
         }
         catch(error){
             cb(null, error)
@@ -64,8 +83,12 @@ io.on('connection', socket => {
         const user = await getOrsetCache(id, async () => await findUser(id))
         try{
             const data = await deleteTaskGroup(user, taskGroupId)
-            console.log(data)
-            cb(data, null)
+            cb(data.tasks, null)
+            const all_sockets = getSocketInstances(id)
+            all_sockets.forEach(socket_id => {
+                if (socket_id === socket.id) return
+                io.to(socket_id).emit('api-user-update-instance', data.tasks, 'taskGroup-del')
+            })
         }
         catch(error){
             console.log(error)
@@ -77,7 +100,12 @@ io.on('connection', socket => {
         const user = await getOrsetCache(id, async () => await findUser(id))
         try{
             const data = await addTask(user, taskGroupIndex, desc, date)
-            cb(data, null)
+            cb(data.tasks[taskGroupIndex].current, null)
+            const all_sockets = getSocketInstances(id)
+            all_sockets.forEach(socket_id => {
+                if (socket_id === socket.id) return
+                io.to(socket_id).emit('api-user-update-instance', data.tasks, 'task-add')
+            })
         }
         catch(error){
             cb(null, error)
@@ -88,7 +116,12 @@ io.on('connection', socket => {
         const user = await getOrsetCache(id, async () => await findUser(id))
         try{
             const data = await deleteTask(user, taskGroupIndex, taskId, isCurrent)
-            cb(data, null)
+            cb((isCurrent) ? data.tasks[taskGroupIndex].current : data.tasks[taskGroupIndex].completed, null)
+            const all_sockets = getSocketInstances(id)
+            all_sockets.forEach(socket_id => {
+                if (socket_id === socket.id) return
+                io.to(socket_id).emit('api-user-update-instance', data.tasks, 'task-del')
+            })
         }
         catch(error){
             cb(null, error)
@@ -98,12 +131,26 @@ io.on('connection', socket => {
     socket.on('api-user-task-mark', async (id, taskGroupIndex, taskId, isCurrent, cb) => {
         const user = await getOrsetCache(id, async () => await findUser(id))
         try{
+            console.log(taskGroupIndex, taskId)
             const data = await markTask(user, taskGroupIndex, taskId, isCurrent)
-            cb(data, null)
+            cb(data.tasks[taskGroupIndex], null)
+            console.log(data.tasks[taskGroupIndex])
+            const all_sockets = getSocketInstances(id)
+            all_sockets.forEach(socket_id => {
+                if (socket_id === socket.id) return
+                io.to(socket_id).emit('api-user-update-instance', data.tasks, 'task-mark')
+            })
         }
         catch(error){
+            console.log(error)
             cb(null, error)
         }
+    })
+
+    // user disconnects
+    socket.on('disconnect', () => {
+        removeSocketInstance(socket.id)
+        io.emit('get-local-cache', getCacheData())
     })
 })  
 
@@ -111,12 +158,17 @@ app.post('/api/login/google', async (req, res) => {
     const {access_token} = req.body;
     const {email, name, picture} = await getGoogleUser(access_token)
     try{
-        const user = await getOrsetCache(email, async () => await upSertUser(email, name, picture))
+        const user = await upSertUser(email, name, picture)
         res.status(200).send(user)
     }
     catch(error){
+        console.log(error)
         res.status(401).send({message : error})
     }
+})
+
+app.get('/api/dashboard', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'dashbaord.html'))
 })
 
 server.listen(port)

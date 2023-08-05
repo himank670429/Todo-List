@@ -9,9 +9,33 @@ import axios from 'axios';
 export const DataContext = createContext();
 
 function DataProvider({children}){
-    const [socket, setSocket] = useState(io.connect(process.env.REACT_APP_SERVER_URL))
+    const [socket, setSocket] = useState(null)
+    const [appData, setAppData] = useState(null)
     const {pathname} = useLocation();
+    const [connected, setConnected] = useState([false, false]);
     const navigate = useNavigate();    
+    const [currentGroupIndex, setCurrentGroupIndex] = useState(null);
+    const [currentGroupToBeDeletedId, setCurrentGroupToBeDeletedId] = useState(null);
+
+    useEffect(() => {
+        const newSocket = io.connect(process.env.REACT_APP_SERVER_URL);
+        setSocket(newSocket);
+        setConnected(prev => {
+            const updated_data = [...prev]
+            updated_data[0] = true
+            return updated_data;
+        })
+        return () => {
+            setConnected(prev => {
+                const updated_data = [...prev]
+                updated_data[0] = false
+                return updated_data;
+            })
+            newSocket.disconnect();
+        };
+    }, []); 
+
+
     useEffect(() => {
         if (pathname === '/Login' || pathname === '/'){
             const access_token = getCookie('access-token');
@@ -21,6 +45,11 @@ function DataProvider({children}){
                 .then(data => {
                     setAppData(data)
                     navigate('/Home')
+                    setConnected(prev => {
+                        const updated_data = [...prev]
+                        updated_data[1] = true
+                        return updated_data
+                    })
                 })
             }
             else{
@@ -29,22 +58,43 @@ function DataProvider({children}){
         }
     }, [navigate, pathname, socket])
 
+    useEffect(() => {
+        if (connected[0] && connected[1]){
+            socket.on('connect', () => {
+                socket.emit("api-user-connect", appData.email)
+            })
+            socket.emit("api-user-connect", appData.email)
+        }
+    },[connected])
 
-    const [appData, setAppData] = useState(null)
-    const [currentGroupIndex, setCurrentGroupIndex] = useState(null);
-    const [currentGroupToBeDeletedId, setCurrentGroupToBeDeletedId] = useState(null);
+    useEffect(() => {
+        if (!socket){return}
+        socket.on('api-user-update-instance', (data, action_string) => {
+            setAppData(prev => {
+                const updated_value = {...prev}
+                updated_value.tasks = data
+                if (pathname === '/Task' && action_string === 'taskGroup-del'){
+                    navigate('/Home')
+                }
+                return updated_value;
+            })
+        })
+    }, [socket, navigate, pathname])
 
     async function login(access_token){
         const res = await axios.post(`${process.env.REACT_APP_SERVER_URL}/api/login/google`, {access_token})
         return res.data
     }
+
     // app operation 
     function addTaskGroup(category, hexValue){
         function addZeroes(num){
             return String(num).padStart(2, '0');
         }
-        const {day, month, year} = getDate();
-        const date_string = `${addZeroes(day)}/${addZeroes(month)}/${addZeroes(year)}`
+        const {day, month, year, hour, min, sec, milsec} = getDate();
+        const date_string = `${addZeroes(day)}/${addZeroes(month)}/${addZeroes(year)}/${addZeroes(
+            milsec + 1000*sec + 1000*60*min + 1000*60*60*hour
+        )}`
         
         socket.emit('api-user-taskGroup-add', appData.email, category, hexValue, date_string, (data, error) => {
             if (error){
@@ -121,6 +171,7 @@ function DataProvider({children}){
                 console.log(error)
                 return
             }
+            console.log(data)
             setAppData(prev => {
                 const updated_value = {...prev}
                 updated_value.tasks[currentGroupIndex] = data
@@ -167,8 +218,11 @@ function DataProvider({children}){
         markTaskAsDone,
         markTaskAsNoteDone,
 
+        connected, 
+        setConnected,
         login,
         socket,
+        setSocket,
     }}>
         {children}
     </DataContext.Provider>

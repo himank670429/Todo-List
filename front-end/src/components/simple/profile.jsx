@@ -5,7 +5,7 @@ import deleteCookie from '../../helper/deleteCookie';
 import { DataContext } from "../../context/DataContext";
 import { useContext } from "react";
 function Profile() {
-    const {socket} = useContext(DataContext)
+    const {socket, setConnected} = useContext(DataContext)
     const navigate = useNavigate();
     const {username, avatar} = useProfile();
     const [shown, setShown] = useState(false);
@@ -22,6 +22,11 @@ function Profile() {
             <span onClick = {() => {
                 deleteCookie('access-token')
                 socket.disconnect()
+                setConnected(prev => {
+                    const updated_data = [...prev]
+                    updated_data[0] = false
+                    return updated_data;
+                })
                 navigate('/Login')
             }} className="dropdown-content-item"><i className = "fa-solid fa-arrow-right-from-bracket"/>Logout</span>
             <span className="dropdown-content-item" onClick={() => setShown(false)}><i className="fa-solid fa-xmark" />close</span>

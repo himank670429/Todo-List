@@ -12,28 +12,28 @@ module.exports = {
             completed : [],
         })
         await userInstance.save()
-        return userInstance.tasks;
+        return userInstance;
     },
     deleteTaskGroup : async (userInstance, taskGroupId) => {
         userInstance.tasks = userInstance.tasks.filter(item => item.id !== taskGroupId)
         await userInstance.save();
-        return userInstance.tasks;
+        return userInstance;
     },
     addTask : async (userInstance, taskGroupIndex, desc, date) => {
         userInstance.tasks[taskGroupIndex].current.push({desc, date})
         await userInstance.save();
-        return userInstance.tasks[taskGroupIndex].current;
+        return userInstance;
     },
     deleteTask : async (userInstance, taskGroupIndex, taskId, isCurrentTask) => {
         if (isCurrentTask){
             userInstance.tasks[taskGroupIndex].current = userInstance.tasks[taskGroupIndex].current.filter(item => item.id !== taskId)
             await userInstance.save();
-            return userInstance.tasks[taskGroupIndex].current;
+            return userInstance;
         }
         else{
             userInstance.tasks[taskGroupIndex].completed = userInstance.tasks[taskGroupIndex].completed.filter(item => item.id !== taskId)
             await userInstance.save();
-            return userInstance.tasks[taskGroupIndex].completed;
+            return userInstance;
         }
     },
     markTask : async (userInstance, taskGroupIndex, taskId, isCurrentTask) => {
@@ -55,6 +55,6 @@ module.exports = {
             userInstance.tasks[taskGroupIndex].current.push(taskToBeMarked);  
         }
         await userInstance.save();
-        return userInstance.tasks[taskGroupIndex]
+        return userInstance;
     },
 }

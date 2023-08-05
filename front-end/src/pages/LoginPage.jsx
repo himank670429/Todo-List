@@ -4,9 +4,10 @@ import { useGoogleLogin } from '@react-oauth/google';
 import { DataContext } from '../context/DataContext';
 import { useContext } from 'react';
 import setCookie from '../helper/setCookie';
+import io from 'socket.io-client';
 function LoginPage() {
   const navigate = useNavigate(); 
-  const {login, setAppData} = useContext(DataContext);
+  const {login, setAppData, setSocket, setConnected} = useContext(DataContext);
 
   const googleLogin = useGoogleLogin({
     onSuccess: async (response) => {
@@ -15,6 +16,14 @@ function LoginPage() {
       .then(data => {
         setAppData(data)
         setCookie('access-token', access_token, expires_in)
+        const newSocket = io.connect(process.env.REACT_APP_SERVER_URL);
+        setSocket(newSocket);
+        setConnected(prev => {
+          const updated_data = [...prev]
+          updated_data[0] = true
+          return updated_data;
+        })
+        newSocket.emit("api-user-connect", data.email)
         navigate('/Home')
       })
     }
