@@ -33,18 +33,19 @@ function LoginPage() {
     <>
       <div className = 'login'>
         <div className="logo">
-          <span>dev.himank.</span>
+          <span data-color = 'grey'>dev.himank.</span>
           <span data-color = "blue">todo</span>
         </div>
         <p className="note">
           welcome to dev.himank.todo<br/>
-          login or singup to continue with&nbsp; 
+          login with &nbsp; 
           <font color = "#4285F4">G</font>
           <font color = "#EA4335">o</font>
           <font color = '#FBBC05'>o</font>
           <font color = "#4285F4">g</font>
           <font color = '#34A853'>l</font>
           <font color = "#EA4335">e</font>
+          &nbsp; to continue.
         </p>
         <div className="buttons">
         <ButtonPrimary text = "login" eventHandler={googleLogin}/>

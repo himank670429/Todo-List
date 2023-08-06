@@ -1,7 +1,6 @@
-import React, { Component } from 'react';
-import { Navigate } from 'react-router-dom';
+import React from 'react';
 
-class ErrorBoundary extends Component {
+class ErrorBoundary extends React.Component {
   state = {
     hasError: false
   };
@@ -12,13 +11,11 @@ class ErrorBoundary extends Component {
 
   componentDidCatch(error, errorInfo) {
     this.setState({ hasError: true });
-    console.error('Error caught by ErrorBoundary:', error);
-    console.error('Error info:', errorInfo);
   }
 
   render() {
     if (this.state.hasError) {
-      return this.props.fallback;
+        return this.props.fallback;
     }
 
     return this.props.children;

@@ -12,7 +12,7 @@ function AboutContent() {
         style = {{marginTop : "3rem"}}
         className="about-content social">
             <span style = {{marginRight : "1rem"}}>Follow us on</span>
-            <Link to = ""><i class="fa-brands fa-instagram"/></Link>
+            <Link to = "https://www.instagram.com/dev.himank/"><i class="fa-brands fa-instagram"/></Link>
             <Link to = "https://github.com/himank670429"><i class="fa-brands fa-github"/></Link>
             <Link to = "https://www.linkedin.com/in/himank-singh-65b411249/"><i class="fa-brands fa-linkedin"/></Link>
         </div>

@@ -3,18 +3,37 @@ import {CurrentTask, ComletedTask} from "./Task";
 import { rgbToHex, hexToRgb, darken } from "../../helper/color";
 import TaskInput from "./taskInput";
 import { DataContext } from "../../context/DataContext";
-import { useContext } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
-import ErrorBoundary from "../Error/ErrorBoundary";
+import { useContext} from "react";
 function TaskTabs() {
   const {currentGroupIndex, appData} = useContext(DataContext);
-  const currentTaskGroup = appData.tasks[currentGroupIndex]
-  const color = currentTaskGroup.card.theme;
-  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('current');
+
+  const currentTaskGroup = appData.tasks[currentGroupIndex]
+  if (!currentTaskGroup) { // when the current taskGroup we get deleted by another instance
+    return <></>;
+  }
+  const color = currentTaskGroup.card.theme;
   const darkColor = rgbToHex(...darken(hexToRgb(color), 0.4))
+
+  function currentTabContent(array){
+    if (array.length === 0){
+      return <span style = {{fontSize : '20px'}}>No current Tasks</span>
+    }
+    return array.map((item, index) => {
+      return <CurrentTask key = {item._id} desc = {item.desc} id = {item._id}/>
+    })
+  }
+  function completedTabContent(array){
+    if (array.length === 0){
+      return <span style = {{fontSize : '20px'}} >No completed Tasks</span>
+    }
+    return array.map((item, index) => {
+      return <ComletedTask key = {item._id} desc = {item.desc} id = {item._id}/>
+    })
+  }
+
   return (
-    <ErrorBoundary fallback = {"error"}>
+    <>
       <div className = 'tab-container'>
         <div className='tab-nav'>
           <span style = {{backgroundColor : (activeTab === 'current') ? color : darkColor}} onClick = {() => setActiveTab('current')} className={`tab-nav-item`}>
@@ -27,16 +46,12 @@ function TaskTabs() {
           </span>
         </div>
         <div style = {{backgroundColor : color}} className='tab-content'>
-          {activeTab === "completed" && currentTaskGroup.completed.map((item, index) => {
-            return <ComletedTask key = {item._id} desc = {item.desc} id = {item._id}/>
-          })}
-          {activeTab === "current" && currentTaskGroup.current.map((item, index) => {
-            return <CurrentTask key = {item._id} desc = {item.desc} id = {item._id}/>
-          })}
+          {activeTab === "completed" && completedTabContent(currentTaskGroup.completed)}
+          {activeTab === "current" && currentTabContent(currentTaskGroup.current)}
         </div>
       </div>
       {activeTab === 'current' && <TaskInput />}
-    </ErrorBoundary>
+    </>
   )
 }
 

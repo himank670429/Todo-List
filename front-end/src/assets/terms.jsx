@@ -2,7 +2,7 @@ function Terms() {
   return (
     <div className = 'terms'>
       <div className="section">
-        <p>Last updated: July 20, 2023</p>
+        <p>Last updated: August 06, 2023</p>
         <p>Please read these terms and conditions carefully before using Our Service.</p>
       </div>
       

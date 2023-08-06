@@ -73,9 +73,6 @@ function DataProvider({children}){
             setAppData(prev => {
                 const updated_value = {...prev}
                 updated_value.tasks = data
-                if (pathname === '/Task' && action_string === 'taskGroup-del'){
-                    navigate('/Home')
-                }
                 return updated_value;
             })
         })
@@ -91,10 +88,8 @@ function DataProvider({children}){
         function addZeroes(num){
             return String(num).padStart(2, '0');
         }
-        const {day, month, year, hour, min, sec, milsec} = getDate();
-        const date_string = `${addZeroes(day)}/${addZeroes(month)}/${addZeroes(year)}/${addZeroes(
-            milsec + 1000*sec + 1000*60*min + 1000*60*60*hour
-        )}`
+        const {day, month, year} = getDate();
+        const date_string = `${addZeroes(day)}/${addZeroes(month)}/${addZeroes(year)}`
         
         socket.emit('api-user-taskGroup-add', appData.email, category, hexValue, date_string, (data, error) => {
             if (error){

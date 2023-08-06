@@ -1,9 +1,5 @@
 import React from 'react'
 import {Link} from 'react-router-dom';
-
-import { DataContext } from '../../context/DataContext';
-import { useContext } from 'react';
-
 function Footer() {
   return (
     <div className='footer'>
@@ -13,6 +9,7 @@ function Footer() {
         <Link to = '/About' className = "footer-item footer-link">About us</Link>
         <Link to = 'https://github.com/himank670429' className = "footer-item footer-link">GitHub</Link>
         <Link to = 'https://www.linkedin.com/in/himank-singh-65b411249/' className = "footer-item footer-link">LinkedIn</Link>
+        <Link to = 'https://www.instagram.com/dev.himank/' className = 'footer-item footer-link'>Instagram</Link>
     </div>
   )
 }

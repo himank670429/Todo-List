@@ -194,6 +194,10 @@
   color: black;
 }
 
+[data-color=grey] {
+  color: #4B4B4B;
+}
+
 .logo {
   padding-top: 1em;
   padding-bottom: 1em;
@@ -420,7 +424,7 @@
 .card-input {
   color: white;
   font-weight: bold;
-  min-height: 5rem;
+  min-height: 2.5em;
 }
 .card-input input {
   font-size: 1.2rem;
@@ -430,7 +434,7 @@
   background-color: inherit;
   color: white;
   caret-color: white;
-  border-bottom: 0.12rem solid white;
+  border-bottom: 0.12em solid white;
 }
 .card-input i:last-child {
   font-size: 1.3rem;
