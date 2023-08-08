@@ -2,7 +2,6 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 const app = express();
-const session = require('express-session');
 const port = process.env.PORT || 3001
 const http = require('http')
 const {Server} = require('socket.io')
@@ -163,7 +162,7 @@ io.on('connection', socket => {
     // user disconnects
     socket.on('disconnect', () => {
         removeSocketInstance(socket.id)
-        removeSocketInstance(socket.id)
+        removeDashBoardSocketInstance(socket.id)
     })
 })  
 
