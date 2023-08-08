@@ -2,12 +2,15 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 const app = express();
+const session = require('express-session');
 const port = process.env.PORT || 3001
 const http = require('http')
 const {Server} = require('socket.io')
 const mongoose = require('mongoose');
 mongoose.connect(process.env.DB_URI);
-const path = require('path')
+
+
+const jwt = require('jsonwebtoken')
 
 // local libraries
 const {
@@ -28,7 +31,10 @@ const {
     getCacheData,    
     addSocketInstance,
     getSocketInstances,
-    removeSocketInstance
+    removeSocketInstance,
+    addDashboardSocketInstance,
+    removeDashBoardSocketInstance,
+    getDashboardInstance,
 } = require('./controller/cache/localCache');
 
 // setups 
@@ -61,7 +67,8 @@ io.on('connection', socket => {
     socket.on('api-user-connect', async (id) => {
         await getOrsetCache(id, async () => await findUser(id))
         addSocketInstance(id, socket.id)
-        io.emit('get-local-cache', getCacheData())
+        // emit to all the connected dashboards sockets
+        getDashboardInstance().forEach(socket_id => io.to(socket_id).emit('get-local-cache', getCacheData()))
     })
     socket.on('api-user-taskGroup-add', async (id, title, theme, date, cb) => {
         const user = await getOrsetCache(id, async () => await findUser(id))
@@ -146,29 +153,43 @@ io.on('connection', socket => {
             cb(null, error)
         }
     })
-
+    socket.on('get-local-cache', (access_token, cb) => {
+        const data = jwt.decode(access_token)
+        if (data === process.env.DASHBOARD_ID){
+            addDashboardSocketInstance(socket.id)
+            cb(getCacheData())
+        }
+    })
     // user disconnects
     socket.on('disconnect', () => {
         removeSocketInstance(socket.id)
-        io.emit('get-local-cache', getCacheData())
+        removeSocketInstance(socket.id)
     })
 })  
 
 app.post('/api/login/google', async (req, res) => {
     const {access_token} = req.body;
-    const {email, name, picture} = await getGoogleUser(access_token)
     try{
+        const {email, name, picture} = await getGoogleUser(access_token)
         const user = await upSertUser(email, name, picture)
         res.status(200).send(user)
     }
     catch(error){
-        console.log(error)
-        res.status(401).send({message : error})
+        if (error.reponse.status === 401) res.status(401).send({message : "unauthorized access"})
+        else res.status(500).send({message : "internal server error"})
     }
 })
 
-app.get('/api/dashboard', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'dashbaord.html'))
+
+app.get('/api/login/dashboard', (req, res) => {
+    const {id} = req.query;
+    if (id === process.env.DASHBOARD_ID){
+        const signed_token = jwt.sign(id, process.env.TOKEN_SECRET)
+        res.status(200).send({valid : true, access_token : signed_token})
+    }
+    else{
+        res.status(401).send({valid : false})
+    }
 })
 
 server.listen(port)

@@ -175,7 +175,7 @@ function Privacy() {
             <h1>Contact Us</h1>
             <p>If you have any questions about this Privacy Policy, You can contact us:</p>
             <ul>
-            <li>By email: <a href="mailto:dev.himank.official@gmail.com" class="__cf_email__" data-cfemail="86e2e3f0a8eeefebe7e8eda8e9e0e0efe5efe7eac6e1ebe7efeaa8e5e9eb">dev.himank.official@gmail.com</a></li>
+            <li>By email: <a href="mailto:dev.himank.official@gmail.com" className="__cf_email__" data-cfemail="86e2e3f0a8eeefebe7e8eda8e9e0e0efe5efe7eac6e1ebe7efeaa8e5e9eb">dev.himank.official@gmail.com</a></li>
             </ul>
             <br /><hr /><br />
         </div>

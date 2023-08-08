@@ -1,5 +1,6 @@
 const userCache = {}
 const socketCache = {}
+const dashboardSockets = []
 
 function setCache(key, value){
     userCache[key] = {
@@ -16,7 +17,12 @@ function deleteCache(key){
     delete userCache[key];
 }
 function getCacheData(){
-    return {...userCache}
+    const transformedData = {};
+    for (const userEmail in userCache) {
+        const socketInstances = userCache[userEmail].socket_instance;
+        transformedData[userEmail] = socketInstances;
+    }
+    return transformedData
 }
 
 function addSocketInstance(key, socket_id){
@@ -42,14 +48,24 @@ function removeSocketInstance(socket_id){
     if (key){
         userCache[key].socket_instance = userCache[key].socket_instance.filter(id => id!==socket_id)
         if (userCache[key].socket_instance.length === 0){
-            delete userCache[key]
+            setInterval(() => {
+                delete userCache[key]
+            }, 300000); // delete the user fater 5 mins
         }
         delete socketCache[socket_id]
     }
-
+}
+function getDashboardInstance(){
+    return [...dashboardSockets]
 }
 
-// function 
+function addDashboardSocketInstance(id){
+    if (dashboardSockets.includes(id)) return
+    dashboardSockets.push(id)
+}
+function removeDashBoardSocketInstance(id){
+    dashboardSockets = dashboardSockets.filter(item => item !== id)
+}
 
 module.exports = {
     setCache, 
@@ -60,48 +76,7 @@ module.exports = {
     checkSocketInstance,
     removeSocketInstance,
     getSocketInstances,
+    addDashboardSocketInstance,
+    removeDashBoardSocketInstance,
+    getDashboardInstance,
 }
-
-/*
-cahce = {
-    user_email = {
-        socket_instances = [
-            SOCKET_ID_1,
-            SOCKET_ID_2,
-            SOCKET_ID_3,
-            SOCKET_ID_4,
-        ]
-        user_instance = {
-            USER_DATA
-        }
-    },
-
-    user_email = {
-        socket_instances = [
-            SOCKET_ID_1,
-            SOCKET_ID_2,
-            SOCKET_ID_3,
-            SOCKET_ID_4,
-        ]
-        user_instance = {
-            USER_DATA
-        }
-    },
-
-    user_email = {
-        socket_instances = [
-            SOCKET_ID_1,
-            SOCKET_ID_2,
-            SOCKET_ID_3,
-            SOCKET_ID_4,
-        ]
-        user_instance = {
-            USER_DATA
-        }
-    },
-}
-
-socketCache = {
-    socket_id : user_email
-}
-*/

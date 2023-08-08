@@ -10,7 +10,7 @@ module.exports = {
             return res.data;
         }
         catch(error){
-            console.error(error);
+            throw error;
         }
     }
 }

@@ -16,11 +16,11 @@ export default function TaskGroupCreateModal(){
     const [hexValue, setHexValue] = useState('#000000');
 
     const [category, setCategory] = useState('');
-
+    //enter name for yout task category.
     function RenderNote(){
         return <>
         {error 
-        ? <p className="modal-container-error">Note : enter name for yout task category.</p> 
+        ? <p className="modal-container-error">Note : {error.message}</p> 
         : <p className = "modal-container-note">Note : Color organization simplifies life, saves time, and adds beauty to your surroundings. add color you your task group to make easier to work with.</p>}
         </>
     }    
@@ -42,8 +42,8 @@ export default function TaskGroupCreateModal(){
                 <hr className="modal-contianer-ruler"/>
 
                 <div className = 'modal-section'>
-                    <label className = "modal-container-label" htmlFor = 'category-name'>category name</label>
-                    <input ref = {categoryRef} className = "modal-container-input input-text" type = 'text' id = 'category-name' placeholder="e.g. Daily Task" onChange={(e) => setCategory(e.target.value)}/>
+                    <label className = "modal-container-label" htmlFor = 'category-name'>category name : {category.length}</label>
+                    <input ref = {categoryRef} className = "modal-container-input input-text" type = 'text' id = 'category-name' max={12} placeholder="e.g. Daily Task" onChange={(e) => setCategory(e.target.value)}/>
                     <RenderNote />
                 </div>
                 
@@ -70,7 +70,16 @@ export default function TaskGroupCreateModal(){
                     <div style = {{display: "flex"}}>
                         <ButtonPrimary text = 'Done' eventHandler={() => {
                             if (category === ""){
-                                setError(true)
+                                setError(prev => {
+                                    return {...prev, message : "enter name for yout task category."}
+                                })
+                                categoryRef.current.focus();
+                                return;
+                            }
+                            if (category.length >= 12){
+                                setError(prev => {
+                                    return {...prev, message : "must not exeed limit of 12 character."}
+                                })
                                 categoryRef.current.focus();
                                 return;
                             }

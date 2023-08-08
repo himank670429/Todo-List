@@ -26,6 +26,13 @@ function LoginPage() {
         newSocket.emit("api-user-connect", data.email)
         navigate('/Home')
       })
+      .catch(error => {
+        // if unauthorized access 
+        if (error.response.status === 401){
+          const requestMessage = JSON.parse(error.request.response).message
+          alert(requestMessage)
+        }
+      })
     }
   });
 
