@@ -12,44 +12,52 @@ function DataProvider({children}){
     const [socket, setSocket] = useState(null)
     const [appData, setAppData] = useState(null)
     const {pathname} = useLocation();
-    const [connected, setConnected] = useState([false, false]);
     const navigate = useNavigate();    
-    const [currentGroupIndex, setCurrentGroupIndex] = useState(null);
+    const [currentGroupId, setCurrentGroupId] = useState(null);
     const [currentGroupToBeDeletedId, setCurrentGroupToBeDeletedId] = useState(null);
+    const [socketToken, setSocketToken] = useState(null)
 
     useEffect(() => {
-        const newSocket = io.connect(process.env.REACT_APP_SERVER_URL);
-        setSocket(newSocket);
-        setConnected(prev => {
-            const updated_data = [...prev]
-            updated_data[0] = true
-            return updated_data;
-        })
-        return () => {
-            setConnected(prev => {
-                const updated_data = [...prev]
-                updated_data[0] = false
-                return updated_data;
-            })
-            newSocket.disconnect();
-        };
-    }, []); 
+        if (socketToken && appData){
+            // now create a new connection and register it self to the server
+            const new_socket = io.connect(process.env.REACT_APP_SERVER_URL);
+            new_socket.emit('api-user-connect', appData?.email)
 
+            // set it to state
+            setSocket(new_socket)
+
+            // delete connection when app closes
+            return () => {
+                new_socket.disconnect();
+            }
+
+        }
+    }, [socketToken, appData])
+    
+    useEffect(() => {
+        if (!appData) return
+        if (!socket) return
+        socket.on('connect', () => {
+            socket.emit('api-user-connect', appData?.email)
+        })
+    }, [socket, appData])
 
     useEffect(() => {
         if (pathname === '/Login' || pathname === '/'){
             const access_token = getCookie('access-token');
-            if (access_token){
+            const socket_token = getCookie('socket-token')
+            // const socket
+            if (access_token && socket_token){
+                setSocketToken(socket_token)
+                // retrieve user data from api/ one time fetch
                 const decodedValue = decodeURIComponent(access_token)
                 login(decodedValue)
-                .then(data => {
+                .then(({data, token}) => {
                     setAppData(data)
                     navigate('/Home')
-                    setConnected(prev => {
-                        const updated_data = [...prev]
-                        updated_data[1] = true
-                        return updated_data
-                    })
+                })
+                .catch(error => {
+                    console.log(error)
                 })
             }
             else{
@@ -57,15 +65,6 @@ function DataProvider({children}){
             }
         }
     }, [navigate, pathname, socket])
-
-    useEffect(() => {
-        if (connected[0] && connected[1]){
-            socket.on('connect', () => {
-                socket.emit("api-user-connect", appData.email)
-            })
-            socket.emit("api-user-connect", appData.email)
-        }
-    },[connected])
 
     useEffect(() => {
         if (!socket){return}
@@ -78,6 +77,7 @@ function DataProvider({children}){
         })
     }, [socket, navigate, pathname])
 
+    // helper function 
     async function login(access_token){
         const res = await axios.post(`${process.env.REACT_APP_SERVER_URL}/api/login/google`, {access_token})
         return res.data
@@ -119,73 +119,90 @@ function DataProvider({children}){
     }
 
     function addCurrentTask(desc, date){
-        socket.emit('api-user-task-add', appData.email, currentGroupIndex, desc, date, (data, error) => {
+        socket.emit('api-user-task-add', appData.email, currentGroupId, desc, date, (data, error) => {
             if (error){
                 console.log(error)
                 return
             }
             setAppData(prev => {
                 const updated_value = {...prev}
-                updated_value.tasks[currentGroupIndex].current = data
+                const taskIndexToUpdate = updated_value.tasks.findIndex(task => task._id === currentGroupId);
+                if (taskIndexToUpdate !== -1){
+                    updated_value.tasks[taskIndexToUpdate].current = data
+                }
                 return updated_value
             })
         })
     }
 
     function deleteCompletedTask(taskid){
-        socket.emit('api-user-task-del', appData.email, currentGroupIndex, taskid, false, (data, error) => {
+        socket.emit('api-user-task-del', appData.email, currentGroupId, taskid, false, (data, error) => {
             if (error){
                 console.log(error)
                 return
             }
             setAppData(prev => {
                 const updated_value = {...prev}
-                updated_value.tasks[currentGroupIndex].completed = data
-                return updated_value
+                updated_value.tasks.find(obj => obj._id === currentGroupId).completed = data
+                return {...updated_value}
             })
         })
     }
     
     function deleteCurrentTask(taskid){
-        socket.emit('api-user-task-del', appData.email, currentGroupIndex, taskid, true, (data, error) => {
+        socket.emit('api-user-task-del', appData.email, currentGroupId, taskid, true, (data, error) => {
             if (error){
                 console.log(error)
                 return
             }
             setAppData(prev => {
                 const updated_value = {...prev}
-                updated_value.tasks[currentGroupIndex].current = data
-                return updated_value
+                updated_value.tasks.find(obj => obj._id === currentGroupId).current = data
+                return {...updated_value}
             })
         })
     }
 
     function markTaskAsDone(taskid){
-        socket.emit('api-user-task-mark', appData.email, currentGroupIndex, taskid, true, (data, error) => {
+        socket.emit('api-user-task-mark', appData.email, currentGroupId, taskid, true, (data, error) => {
             if (error){
                 console.log(error)
                 return
             }
-            console.log(data)
+
             setAppData(prev => {
-                const updated_value = {...prev}
-                updated_value.tasks[currentGroupIndex] = data
-                return updated_value
-            })
+                const updatedValue = {
+                  ...prev,
+                  tasks: prev.tasks.map(task => {
+                    if (task._id === currentGroupId) {
+                      return data; 
+                    }
+                    return task; 
+                  })
+                };
+                return updatedValue;
+            });
         }) 
     }
 
     function markTaskAsNoteDone(taskid){
-        socket.emit('api-user-task-mark', appData.email, currentGroupIndex, taskid, false, (data, error) => {
+        socket.emit('api-user-task-mark', appData.email, currentGroupId, taskid, false, (data, error) => {
             if (error){
                 console.log(error)
                 return
             }
             setAppData(prev => {
-                const updated_value = {...prev}
-                updated_value.tasks[currentGroupIndex] = data
-                return updated_value
-            })
+                const updatedValue = {
+                  ...prev,
+                  tasks: prev.tasks.map(task => {
+                    if (task._id === currentGroupId) {
+                      return data; 
+                    }
+                    return task; 
+                  })
+                };
+                return updatedValue;
+            });
         }) 
     }
 
@@ -195,8 +212,8 @@ function DataProvider({children}){
     return <DataContext.Provider value={{
         appData, 
         setAppData,
-        currentGroupIndex,
-        setCurrentGroupIndex,
+        currentGroupId,
+        setCurrentGroupId,
         
         taskCategoryCreateRef,
         taskCategoryDeleteRef,
@@ -213,11 +230,11 @@ function DataProvider({children}){
         markTaskAsDone,
         markTaskAsNoteDone,
 
-        connected, 
-        setConnected,
         login,
         socket,
         setSocket,
+
+        setSocketToken,
     }}>
         {children}
     </DataContext.Provider>

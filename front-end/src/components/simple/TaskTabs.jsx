@@ -5,10 +5,10 @@ import TaskInput from "./taskInput";
 import { DataContext } from "../../context/DataContext";
 import { useContext} from "react";
 function TaskTabs() {
-  const {currentGroupIndex, appData} = useContext(DataContext);
+  const {currentGroupId, appData} = useContext(DataContext);
   const [activeTab, setActiveTab] = useState('current');
 
-  const currentTaskGroup = appData.tasks[currentGroupIndex]
+  const currentTaskGroup = appData.tasks.find(obj => obj._id === currentGroupId)
   if (!currentTaskGroup) { // when the current taskGroup we get deleted by another instance
     return <></>;
   }

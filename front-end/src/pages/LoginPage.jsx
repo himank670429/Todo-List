@@ -4,32 +4,34 @@ import { useGoogleLogin } from '@react-oauth/google';
 import { DataContext } from '../context/DataContext';
 import { useContext } from 'react';
 import setCookie from '../helper/setCookie';
-import io from 'socket.io-client';
 function LoginPage() {
   const navigate = useNavigate(); 
-  const {login, setAppData, setSocket, setConnected} = useContext(DataContext);
+  const {login, setAppData, setSocketToken} = useContext(DataContext);
 
   const googleLogin = useGoogleLogin({
     onSuccess: async (response) => {
       const {access_token, expires_in} = response;
+
+      // login
       login(access_token)
-      .then(data => {
+      .then(({data, token}) => {
+        // set the cookies
+        setCookie('access-token', access_token, expires_in);
+        setCookie('socket-token', token, expires_in);
+        
+        // set the app data and socket token
         setAppData(data)
-        setCookie('access-token', access_token, expires_in)
-        const newSocket = io.connect(process.env.REACT_APP_SERVER_URL);
-        setSocket(newSocket);
-        setConnected(prev => {
-          const updated_data = [...prev]
-          updated_data[0] = true
-          return updated_data;
-        })
-        newSocket.emit("api-user-connect", data.email)
+        
+        // update the state to handle connection in data context
+        setSocketToken(token)
+
+        // navigate to the Home screen
         navigate('/Home')
       })
       .catch(error => {
         // if unauthorized access 
-        if (error.response.status === 401){
-          const requestMessage = JSON.parse(error.request.response).message
+        if (error && error?.response?.status === 401){
+          const requestMessage = JSON.parse(error?.request?.response)?.message
           alert(requestMessage)
         }
       })

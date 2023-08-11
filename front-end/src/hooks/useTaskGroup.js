@@ -3,8 +3,8 @@ import { useContext, useEffect, useState } from "react";
 function useTaskGroup() {
     const { 
         appData, 
-        currentGroupIndex, 
-        setCurrentGroupIndex, 
+        currentGroupId, 
+        setCurrentGroupId, 
         addCurrentTask, 
         deleteCurrentTask, 
         deleteCompletedTask, 
@@ -12,14 +12,19 @@ function useTaskGroup() {
         markTaskAsNoteDone,
     } = useContext(DataContext);
 
-    const [currentTaskGroup, setCurrentTaskGroup] = useState(currentGroupIndex !== null ? appData.tasks[currentGroupIndex] : null)
+    function getTask(id){
+        // console.log(appData.tasks.find(obj => obj._id === id))
+        return appData.tasks.find(obj => obj._id === id)
+    }
+
+    const [currentTaskGroup, setCurrentTaskGroup] = useState(currentGroupId !== null ? getTask(currentGroupId) : null)
     useEffect(() => {
-        setCurrentTaskGroup((prev) => appData.tasks[currentGroupIndex])
-    }, [currentGroupIndex,appData.tasks])
+        setCurrentTaskGroup((prev) => getTask(currentGroupId))
+    }, [currentGroupId, appData.tasks])
 
     return { 
         currentTaskGroup, 
-        setCurrentGroupIndex, 
+        setCurrentGroupId, 
         addCurrentTask, 
         deleteCurrentTask, 
         deleteCompletedTask, 

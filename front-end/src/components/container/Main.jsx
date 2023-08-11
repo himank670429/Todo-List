@@ -6,7 +6,7 @@ import TaskTabs from "../simple/TaskTabs";
 import useTaskGroup from "../../hooks/useTaskGroup";
 function Main() {
   const {data} = useAppData();
-  const {setCurrentGroupIndex} = useTaskGroup();
+  const {setCurrentGroupId} = useTaskGroup();
   
   const {pathname} = useLocation();
   const isHomeRoute = pathname === '/Home'
@@ -25,7 +25,7 @@ function Main() {
           key = {index} 
           data = {item} 
           handleTaskPage = {() => {
-            setCurrentGroupIndex(index)
+            setCurrentGroupId(item._id)
             navigate('/Task')
           }}
         />)}

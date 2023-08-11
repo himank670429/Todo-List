@@ -1,6 +1,6 @@
 const userCache = {}
 const socketCache = {}
-const dashboardSockets = []
+let dashboardSockets = []
 
 function setCache(key, value){
     userCache[key] = {
@@ -46,13 +46,19 @@ function checkSocketInstance(key, socket_id){
 function removeSocketInstance(socket_id){
     const key = socketCache[socket_id]
     if (key){
-        userCache[key].socket_instance = userCache[key].socket_instance.filter(id => id!==socket_id)
-        if (userCache[key].socket_instance.length === 0){
-            setInterval(() => {
-                delete userCache[key]
-            }, 300000); // delete the user fater 5 mins
+        try{
+            userCache[key].socket_instance = userCache[key].socket_instance.filter(id => id!==socket_id)
+            if (userCache[key].socket_instance.length === 0){
+                setInterval(() => {
+                    delete userCache[key]
+                }, 300000); // delete the user after 5 mins
+            }
+            delete socketCache[socket_id]
         }
-        delete socketCache[socket_id]
+        catch(error){
+            // when user connected but does not registers will noe have any socket instance
+            console.log('unable to remove socket instance unregistered user')
+        }
     }
 }
 function getDashboardInstance(){

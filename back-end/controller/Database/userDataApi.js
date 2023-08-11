@@ -19,40 +19,36 @@ module.exports = {
         await userInstance.save();
         return userInstance;
     },
-    addTask : async (userInstance, taskGroupIndex, desc, date) => {
-        userInstance.tasks[taskGroupIndex].current.push({desc, date})
+    addTask : async (userInstance, taskGroupId, desc, date) => {
+        userInstance.tasks.find(obj => obj.id === taskGroupId).current.push({desc, date})
         await userInstance.save();
         return userInstance;
     },
-    deleteTask : async (userInstance, taskGroupIndex, taskId, isCurrentTask) => {
+    deleteTask : async (userInstance, taskGroupId, taskId, isCurrentTask) => {
+        const taskGroupToBeModify = userInstance.tasks.find(obj => obj.id === taskGroupId)
         if (isCurrentTask){
-            userInstance.tasks[taskGroupIndex].current = userInstance.tasks[taskGroupIndex].current.filter(item => item.id !== taskId)
+            taskGroupToBeModify.current = taskGroupToBeModify.current.filter(item => item.id !== taskId)
             await userInstance.save();
             return userInstance;
         }
         else{
-            userInstance.tasks[taskGroupIndex].completed = userInstance.tasks[taskGroupIndex].completed.filter(item => item.id !== taskId)
+            taskGroupToBeModify.current = taskGroupToBeModify.current.filter(item => item.id !== taskId)
             await userInstance.save();
             return userInstance;
         }
     },
-    markTask : async (userInstance, taskGroupIndex, taskId, isCurrentTask) => {
+    markTask : async (userInstance, taskGroupId, taskId, isCurrentTask) => {
+        const taskGroupToBeModify = userInstance.tasks.find(obj => obj.id === taskGroupId)
         let taskToBeMarked;
         if (isCurrentTask){
-            userInstance.tasks[taskGroupIndex].current.forEach(item => {
-                if (item.id === taskId)
-                    taskToBeMarked = item
-            });
-            userInstance.tasks[taskGroupIndex].current = userInstance.tasks[taskGroupIndex].current.filter(item => item.id !== taskId)
-            userInstance.tasks[taskGroupIndex].completed.push(taskToBeMarked);
+            taskToBeMarked = taskGroupToBeModify.current.find(task => task.id === taskId)
+            taskGroupToBeModify.current = taskGroupToBeModify.current.filter(item => item.id !== taskId)
+            if (taskToBeMarked) taskGroupToBeModify.completed.push(taskToBeMarked);
         }
         else{
-            userInstance.tasks[taskGroupIndex].completed.forEach(item => {
-                if (item.id === taskId)
-                    taskToBeMarked = item
-            });
-            userInstance.tasks[taskGroupIndex].completed = userInstance.tasks[taskGroupIndex].completed.filter(item => item.id !== taskId)
-            userInstance.tasks[taskGroupIndex].current.push(taskToBeMarked);  
+            taskToBeMarked = taskGroupToBeModify.completed.find(task => task.id === taskId)
+            taskGroupToBeModify.completed = taskGroupToBeModify.completed.filter(item => item.id !== taskId)
+            if (taskToBeMarked) taskGroupToBeModify.current.push(taskToBeMarked);
         }
         await userInstance.save();
         return userInstance;

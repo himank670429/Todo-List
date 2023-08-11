@@ -11,17 +11,19 @@ import AboutUsPage from './pages/AboutUsPage';
 import TermsPage from './pages/TermsPage';
 import PrivacyPage from './pages/PrivacyPage';
 import LoadingPage from './pages/LoadingPage';
-
+import RequireData from './components/Error/RequireData';
+import useAppData from './hooks/useAppData';
 function App() {
+  const {data} = useAppData();
   return (
     <GoogleOAuthProvider clientId = {process.env.REACT_APP_CLIENT_ID}>
     <Routes>
       <Route path = '/' element = {<LoadingPage />} />
       <Route path = '/login' element = {<LoginPage />} />
       <Route element = {<RequireAuth />}>
-        <Route path = '/Home' element = {<HomePage />}/>
-        <Route path = '/Task' element = {<TaskPage />}/> 
-        <Route path = '/About' element = {<AboutUsPage />}/> 
+        <Route path = '/Home' element = {<RequireData data = {data} to = '/'><HomePage /></RequireData>}/>
+        <Route path = '/Task' element = {<RequireData data = {data} to = '/'><TaskPage /></RequireData>}/> 
+        <Route path = '/About' element = {<RequireData data = {data} to = '/'><AboutUsPage /></RequireData>}/> 
       </Route>
       <Route path = '/Terms' element = {<TermsPage />} />
       <Route path = '/Privacy' element = {<PrivacyPage />} />

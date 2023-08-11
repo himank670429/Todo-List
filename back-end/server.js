@@ -63,7 +63,9 @@ const getOrsetCache = async (key, callback) => {
 
 // server
 io.on('connection', socket => {
+    console.log(socket.id)
     socket.on('api-user-connect', async (id) => {
+        console.log(`user with email : ${id} and id : ${socket.id} connected`)
         await getOrsetCache(id, async () => await findUser(id))
         addSocketInstance(id, socket.id)
         // emit to all the connected dashboards sockets
@@ -81,7 +83,7 @@ io.on('connection', socket => {
             })
         }
         catch(error){
-            cb(null, error)
+            cb(null, error.message)
         }
     })
 
@@ -97,16 +99,16 @@ io.on('connection', socket => {
             })
         }
         catch(error){
-            console.log(error)
-            cb(null, error)
+            cb(null, error.message)
         }
     })  
 
-    socket.on('api-user-task-add', async (id, taskGroupIndex, desc, date, cb) => {
+    socket.on('api-user-task-add', async (id, taskGroupId, desc, date, cb) => {
         const user = await getOrsetCache(id, async () => await findUser(id))
         try{
-            const data = await addTask(user, taskGroupIndex, desc, date)
-            cb(data.tasks[taskGroupIndex].current, null)
+            const data = await addTask(user, taskGroupId, desc, date)
+            const updatedValue = data.tasks.find(obj => obj.id === taskGroupId).current
+            cb(updatedValue, null)
             const all_sockets = getSocketInstances(id)
             all_sockets.forEach(socket_id => {
                 if (socket_id === socket.id) return
@@ -114,15 +116,16 @@ io.on('connection', socket => {
             })
         }
         catch(error){
-            cb(null, error)
+            cb(null, error.message)
         }
     })
 
-    socket.on('api-user-task-del', async (id, taskGroupIndex, taskId, isCurrent, cb) => {
+    socket.on('api-user-task-del', async (id, taskGroupId, taskId, isCurrent, cb) => {
         const user = await getOrsetCache(id, async () => await findUser(id))
         try{
-            const data = await deleteTask(user, taskGroupIndex, taskId, isCurrent)
-            cb((isCurrent) ? data.tasks[taskGroupIndex].current : data.tasks[taskGroupIndex].completed, null)
+            const data = await deleteTask(user, taskGroupId, taskId, isCurrent)
+            const updatedValue = data.tasks.find(obj => obj.id === taskGroupId)
+            cb((isCurrent) ? updatedValue.current : updatedValue.completed, null)
             const all_sockets = getSocketInstances(id)
             all_sockets.forEach(socket_id => {
                 if (socket_id === socket.id) return
@@ -130,17 +133,16 @@ io.on('connection', socket => {
             })
         }
         catch(error){
-            cb(null, error)
+            cb(null, error.message)
         }
     })
 
-    socket.on('api-user-task-mark', async (id, taskGroupIndex, taskId, isCurrent, cb) => {
+    socket.on('api-user-task-mark', async (id, taskGroupId, taskId, isCurrent, cb) => {
         const user = await getOrsetCache(id, async () => await findUser(id))
         try{
-            console.log(taskGroupIndex, taskId)
-            const data = await markTask(user, taskGroupIndex, taskId, isCurrent)
-            cb(data.tasks[taskGroupIndex], null)
-            console.log(data.tasks[taskGroupIndex])
+            const data = await markTask(user, taskGroupId, taskId, isCurrent)
+            const updatedValue = data.tasks.find(obj => obj.id === taskGroupId)
+            cb(updatedValue, null)
             const all_sockets = getSocketInstances(id)
             all_sockets.forEach(socket_id => {
                 if (socket_id === socket.id) return
@@ -148,8 +150,7 @@ io.on('connection', socket => {
             })
         }
         catch(error){
-            console.log(error)
-            cb(null, error)
+            cb(null, error.message)
         }
     })
     socket.on('get-local-cache', (access_token, cb) => {
@@ -161,6 +162,7 @@ io.on('connection', socket => {
     })
     // user disconnects
     socket.on('disconnect', () => {
+        console.log(`user with id : ${socket.id} disconnected`)
         removeSocketInstance(socket.id)
         removeDashBoardSocketInstance(socket.id)
     })
@@ -171,7 +173,8 @@ app.post('/api/login/google', async (req, res) => {
     try{
         const {email, name, picture} = await getGoogleUser(access_token)
         const user = await upSertUser(email, name, picture)
-        res.status(200).send(user)
+        const token = jwt.sign(email, process.env.TOKEN_SECRET)
+        res.status(200).send({data : user, token})
     }
     catch(error){
         if (error.reponse.status === 401) res.status(401).send({message : "unauthorized access"})
