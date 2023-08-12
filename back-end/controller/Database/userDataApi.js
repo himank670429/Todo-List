@@ -32,7 +32,7 @@ module.exports = {
             return userInstance;
         }
         else{
-            taskGroupToBeModify.current = taskGroupToBeModify.current.filter(item => item.id !== taskId)
+            taskGroupToBeModify.completed = taskGroupToBeModify.completed.filter(item => item.id !== taskId)
             await userInstance.save();
             return userInstance;
         }
