@@ -8,7 +8,6 @@ const {Server} = require('socket.io')
 const mongoose = require('mongoose');
 mongoose.connect(process.env.DB_URI);
 
-
 const jwt = require('jsonwebtoken')
 
 // local libraries
@@ -61,96 +60,143 @@ const getOrsetCache = async (key, callback) => {
     return freshData;
 }
 
+// use middle to check fot token
+io.use((socket, next) => {
+    const token = socket.handshake.query.token;
+    if (!token){
+        return next(new Error('unauthorized access'))
+    }
+    try{
+        const decoded = jwt.verify(token, process.env.TOKEN_SECRET)
+        if (decoded){
+            socket.userId = decoded;
+        }
+        return next();
+    }
+    catch(error){
+        return next(new Error("jwt malformed!"))
+    }
+})
+
 // server
 io.on('connection', socket => {
-    console.log(socket.id)
     socket.on('api-user-connect', async (id) => {
-        console.log(`user with email : ${id} and id : ${socket.id} connected`)
-        await getOrsetCache(id, async () => await findUser(id))
-        addSocketInstance(id, socket.id)
-        // emit to all the connected dashboards sockets
-        getDashboardInstance().forEach(socket_id => io.to(socket_id).emit('get-local-cache', getCacheData()))
-    })
-    socket.on('api-user-taskGroup-add', async (id, title, theme, date, cb) => {
-        const user = await getOrsetCache(id, async () => await findUser(id))
-        try{
-            const data = await addTaskGroup(user, title, theme, date)
-            cb(data.tasks, null)
-            const all_sockets = getSocketInstances(id)
-            all_sockets.forEach(socket_id => {
-                if (socket_id === socket.id) return
-                io.to(socket_id).emit('api-user-update-instance', data.tasks, 'taskGroup-add')
-            })
+        // check if the user is authentic or not
+        if (socket.userId === id){
+            await getOrsetCache(id, async () => await findUser(id))
+            addSocketInstance(id, socket.id)
+            // emit to all the connected dashboards sockets
+            getDashboardInstance().forEach(socket_id => io.to(socket_id).emit('get-local-cache', getCacheData()))
         }
-        catch(error){
-            cb(null, error.message)
+
+    })
+
+
+    socket.on('api-user-taskGroup-add', async (id, title, theme, date, cb) => {
+        if (socket.userId === id){
+            const user = await getOrsetCache(id, async () => await findUser(id))
+            try{
+                const data = await addTaskGroup(user, title, theme, date)
+                cb(data.tasks, null)
+                const all_sockets = getSocketInstances(id)
+                all_sockets.forEach(socket_id => {
+                    if (socket_id === socket.id) return
+                    io.to(socket_id).emit('api-user-update-instance', data.tasks)
+                })
+            }
+            catch(error){
+                cb(null, error.message)
+            }
+        }
+        else{
+            cb(null, new Error('unauthorised access'))
         }
     })
 
     socket.on('api-user-taskGroup-del', async (id, taskGroupId, cb) => {
-        const user = await getOrsetCache(id, async () => await findUser(id))
-        try{
-            const data = await deleteTaskGroup(user, taskGroupId)
-            cb(data.tasks, null)
-            const all_sockets = getSocketInstances(id)
-            all_sockets.forEach(socket_id => {
-                if (socket_id === socket.id) return
-                io.to(socket_id).emit('api-user-update-instance', data.tasks, 'taskGroup-del')
-            })
+        if (socket.userId === id){
+            const user = await getOrsetCache(id, async () => await findUser(id))
+            try{
+                const data = await deleteTaskGroup(user, taskGroupId)
+                cb(data.tasks, null)
+                const all_sockets = getSocketInstances(id)
+                all_sockets.forEach(socket_id => {
+                    if (socket_id === socket.id) return
+                    io.to(socket_id).emit('api-user-update-instance', data.tasks)
+                })
+            }
+            catch(error){
+                cb(null, error.message)
+            }
         }
-        catch(error){
-            cb(null, error.message)
+        else{
+            cb(null, new Error('unauthorised access'))
         }
     })  
 
     socket.on('api-user-task-add', async (id, taskGroupId, desc, date, cb) => {
-        const user = await getOrsetCache(id, async () => await findUser(id))
-        try{
-            const data = await addTask(user, taskGroupId, desc, date)
-            const updatedValue = data.tasks.find(obj => obj.id === taskGroupId).current
-            cb(updatedValue, null)
-            const all_sockets = getSocketInstances(id)
-            all_sockets.forEach(socket_id => {
-                if (socket_id === socket.id) return
-                io.to(socket_id).emit('api-user-update-instance', data.tasks, 'task-add')
-            })
+        if (socket.userId === id){
+            const user = await getOrsetCache(id, async () => await findUser(id))
+            try{
+                const data = await addTask(user, taskGroupId, desc, date)
+                const updatedValue = data.tasks.find(obj => obj.id === taskGroupId).current
+                cb(updatedValue, null)
+                const all_sockets = getSocketInstances(id)
+                all_sockets.forEach(socket_id => {
+                    if (socket_id === socket.id) return
+                    io.to(socket_id).emit('api-user-update-instance', data.tasks)
+                })
+            }
+            catch(error){
+                cb(null, error.message)
+            }
         }
-        catch(error){
-            cb(null, error.message)
+        else{
+            cb(null, new Error('unauthorised access'))
         }
     })
 
     socket.on('api-user-task-del', async (id, taskGroupId, taskId, isCurrent, cb) => {
-        const user = await getOrsetCache(id, async () => await findUser(id))
-        try{
-            const data = await deleteTask(user, taskGroupId, taskId, isCurrent)
-            const updatedValue = data.tasks.find(obj => obj.id === taskGroupId)
-            cb((isCurrent) ? updatedValue.current : updatedValue.completed, null)
-            const all_sockets = getSocketInstances(id)
-            all_sockets.forEach(socket_id => {
-                if (socket_id === socket.id) return
-                io.to(socket_id).emit('api-user-update-instance', data.tasks, 'task-del')
-            })
+        if (socket.userId === id){
+            const user = await getOrsetCache(id, async () => await findUser(id))
+            try{
+                const data = await deleteTask(user, taskGroupId, taskId, isCurrent)
+                const updatedValue = data.tasks.find(obj => obj.id === taskGroupId)
+                cb((isCurrent) ? updatedValue.current : updatedValue.completed, null)
+                const all_sockets = getSocketInstances(id)
+                all_sockets.forEach(socket_id => {
+                    if (socket_id === socket.id) return
+                    io.to(socket_id).emit('api-user-update-instance', data.tasks)
+                })
+            }
+            catch(error){
+                cb(null, error.message)
+            }
         }
-        catch(error){
-            cb(null, error.message)
+        else{
+            cb(null, new Error('unauthorised access'))
         }
     })
 
     socket.on('api-user-task-mark', async (id, taskGroupId, taskId, isCurrent, cb) => {
-        const user = await getOrsetCache(id, async () => await findUser(id))
-        try{
-            const data = await markTask(user, taskGroupId, taskId, isCurrent)
-            const updatedValue = data.tasks.find(obj => obj.id === taskGroupId)
-            cb(updatedValue, null)
-            const all_sockets = getSocketInstances(id)
-            all_sockets.forEach(socket_id => {
-                if (socket_id === socket.id) return
-                io.to(socket_id).emit('api-user-update-instance', data.tasks, 'task-mark')
-            })
+        if (socket.userId === id){
+            const user = await getOrsetCache(id, async () => await findUser(id))
+            try{
+                const data = await markTask(user, taskGroupId, taskId, isCurrent)
+                const updatedValue = data.tasks.find(obj => obj.id === taskGroupId)
+                cb(updatedValue, null)
+                const all_sockets = getSocketInstances(id)
+                all_sockets.forEach(socket_id => {
+                    if (socket_id === socket.id) return
+                    io.to(socket_id).emit('api-user-update-instance', data.tasks)
+                })
+            }
+            catch(error){
+                cb(null, error.message)
+            }
         }
-        catch(error){
-            cb(null, error.message)
+        else{
+            cb(null, new Error('unauthorised access'))
         }
     })
     socket.on('get-local-cache', (access_token, cb) => {
@@ -162,7 +208,6 @@ io.on('connection', socket => {
     })
     // user disconnects
     socket.on('disconnect', () => {
-        console.log(`user with id : ${socket.id} disconnected`)
         removeSocketInstance(socket.id)
         removeDashBoardSocketInstance(socket.id)
     })

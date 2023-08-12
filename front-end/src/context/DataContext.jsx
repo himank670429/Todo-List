@@ -16,11 +16,19 @@ function DataProvider({children}){
     const [currentGroupId, setCurrentGroupId] = useState(null);
     const [currentGroupToBeDeletedId, setCurrentGroupToBeDeletedId] = useState(null);
     const [socketToken, setSocketToken] = useState(null)
+    const [connectionStatus, setConnectionStatus] = useState({ // create connection only when the both the thing are available
+        app_data : false,
+        socket_token : false,
+    })
 
     useEffect(() => {
-        if (socketToken && appData){
+        if (connectionStatus.app_data && connectionStatus.socket_token){
             // now create a new connection and register it self to the server
-            const new_socket = io.connect(process.env.REACT_APP_SERVER_URL);
+            const new_socket = io.connect(process.env.REACT_APP_SERVER_URL, {
+                query : {
+                    token : socketToken
+                }
+            });
             new_socket.emit('api-user-connect', appData?.email)
 
             // set it to state
@@ -30,9 +38,8 @@ function DataProvider({children}){
             return () => {
                 new_socket.disconnect();
             }
-
         }
-    }, [socketToken, appData])
+    }, [connectionStatus])
     
     useEffect(() => {
         if (!appData) return
@@ -43,17 +50,30 @@ function DataProvider({children}){
     }, [socket, appData])
 
     useEffect(() => {
+        if (socketToken){
+            setConnectionStatus(prev => ({
+                ...prev,
+                socket_token : true,
+            }))
+        }
+    },[socketToken])
+
+    useEffect(() => {
         if (pathname === '/Login' || pathname === '/'){
             const access_token = getCookie('access-token');
             const socket_token = getCookie('socket-token')
             // const socket
             if (access_token && socket_token){
-                setSocketToken(socket_token)
                 // retrieve user data from api/ one time fetch
                 const decodedValue = decodeURIComponent(access_token)
                 login(decodedValue)
                 .then(({data, token}) => {
                     setAppData(data)
+                    setSocketToken(token)
+                    setConnectionStatus(prev => ({
+                        ...prev, 
+                        app_data : true,
+                    }))
                     navigate('/Home')
                 })
                 .catch(error => {
@@ -64,11 +84,11 @@ function DataProvider({children}){
                 navigate('/Login')
             }
         }
-    }, [navigate, pathname, socket])
+    }, [navigate, pathname])
 
     useEffect(() => {
         if (!socket){return}
-        socket.on('api-user-update-instance', (data, action_string) => {
+        socket.on('api-user-update-instance', (data) => {
             setAppData(prev => {
                 const updated_value = {...prev}
                 updated_value.tasks = data
@@ -233,8 +253,8 @@ function DataProvider({children}){
         login,
         socket,
         setSocket,
-
         setSocketToken,
+        setConnectionStatus
     }}>
         {children}
     </DataContext.Provider>

@@ -6,7 +6,7 @@ import { useContext } from 'react';
 import setCookie from '../helper/setCookie';
 function LoginPage() {
   const navigate = useNavigate(); 
-  const {login, setAppData, setSocketToken} = useContext(DataContext);
+  const {login, setAppData, setConnectionStatus, setSocketToken} = useContext(DataContext);
 
   const googleLogin = useGoogleLogin({
     onSuccess: async (response) => {
@@ -21,9 +21,14 @@ function LoginPage() {
         
         // set the app data and socket token
         setAppData(data)
-        
-        // update the state to handle connection in data context
         setSocketToken(token)
+
+        // set the connection status 
+        setConnectionStatus(prev => ({
+          ...prev,
+          app_data : true,
+          socket_token : true,
+        }))
 
         // navigate to the Home screen
         navigate('/Home')

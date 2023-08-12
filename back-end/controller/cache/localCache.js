@@ -3,74 +3,116 @@ const socketCache = {}
 let dashboardSockets = []
 
 function setCache(key, value){
-    userCache[key] = {
-        user_instance : value,
-        socket_instance : []
+    try{
+        userCache[key] = {
+            user_instance : value,
+            socket_instance : []
+        }
+    }catch(error){
+        throw new Error(error?.message)
     }
 }
 function getCache(key){
-    const value = userCache[key];
-    if (value) return value.user_instance;
-    return null;
+    try{
+
+        const value = userCache[key];
+        if (value) return value.user_instance;
+        return null;
+    }catch(error){
+        throw new Error(error?.message)
+    }
 }
 function deleteCache(key){
-    delete userCache[key];
-}
-function getCacheData(){
-    const transformedData = {};
-    for (const userEmail in userCache) {
-        const socketInstances = userCache[userEmail].socket_instance;
-        transformedData[userEmail] = socketInstances;
+    try{
+        delete userCache[key];
     }
-    return transformedData
-}
-
-function addSocketInstance(key, socket_id){
-    if (checkSocketInstance(key, socket_id)){
-        return
+    catch(error){
+        throw new Error(error?.message)
     }
-    userCache[key].socket_instance.push(socket_id)
-    socketCache[socket_id] = key
 }
-
-function getSocketInstances(key){
-    if (getCache(key)){
-        return userCache[key].socket_instance
+function getCacheData() {
+    try {
+        const transformedData = {};
+        for (const userEmail in userCache) {
+            const socketInstances = userCache[userEmail].socket_instance;
+            transformedData[userEmail] = socketInstances;
+        }
+        return transformedData;
+    } catch (error) {
+        throw new Error(error?.message);
     }
 }
 
-function checkSocketInstance(key, socket_id){
-    return userCache[key].socket_instance.includes(socket_id)
+function addSocketInstance(key, socket_id) {
+    try {
+        if (checkSocketInstance(key, socket_id)) {
+            return;
+        }
+        userCache[key].socket_instance.push(socket_id);
+        socketCache[socket_id] = key;
+    } catch (error) {
+        throw new Error(error?.message);
+    }
 }
 
-function removeSocketInstance(socket_id){
-    const key = socketCache[socket_id]
-    if (key){
-        try{
-            userCache[key].socket_instance = userCache[key].socket_instance.filter(id => id!==socket_id)
-            if (userCache[key].socket_instance.length === 0){
+function getSocketInstances(key) {
+    try {
+        if (getCache(key)) {
+            return userCache[key].socket_instance;
+        }
+    } catch (error) {
+        throw new Error(error?.message);
+    }
+}
+
+function checkSocketInstance(key, socket_id) {
+    try {
+        return userCache[key].socket_instance.includes(socket_id);
+    } catch (error) {
+        throw new Error(error?.message);
+    }
+}
+
+function removeSocketInstance(socket_id) {
+    try {
+        const key = socketCache[socket_id];
+        if (key) {
+            userCache[key].socket_instance = userCache[key].socket_instance.filter(id => id !== socket_id);
+            if (userCache[key].socket_instance.length === 0) {
                 setInterval(() => {
-                    delete userCache[key]
+                    delete userCache[key];
                 }, 300000); // delete the user after 5 mins
             }
-            delete socketCache[socket_id]
+            delete socketCache[socket_id];
         }
-        catch(error){
-            // when user connected but does not registers will noe have any socket instance
-            console.log('unable to remove socket instance unregistered user')
-        }
+    } catch (error) {
+        throw new Error(error?.message);
     }
 }
-function getDashboardInstance(){
-    return [...dashboardSockets]
+
+function getDashboardInstance() {
+    try {
+        return [...dashboardSockets];
+    } catch (error) {
+        throw new Error(error?.message);
+    }
 }
 
-function addDashboardSocketInstance(id){
-    if (dashboardSockets.includes(id)) return
-    dashboardSockets.push(id)
+function addDashboardSocketInstance(id) {
+    try {
+        if (dashboardSockets.includes(id)) return;
+        dashboardSockets.push(id);
+    } catch (error) {
+        throw new Error(error?.message);
+    }
 }
-function removeDashBoardSocketInstance(id){
-    dashboardSockets = dashboardSockets.filter(item => item !== id)
+
+function removeDashBoardSocketInstance(id) {
+    try {
+        dashboardSockets = dashboardSockets.filter(item => item !== id);
+    } catch (error) {
+        throw new Error(error?.message);
+    }
 }
 
 module.exports = {
