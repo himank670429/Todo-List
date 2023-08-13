@@ -12,14 +12,12 @@ function useTaskGroup() {
         markTaskAsNoteDone,
     } = useContext(DataContext);
 
-    function getTask(id){
-        // console.log(appData.tasks.find(obj => obj._id === id))
-        return 
-    }
 
-    const [currentTaskGroup, setCurrentTaskGroup] = useState(currentGroupId !== null ? getTask(currentGroupId) : null)
+    const [currentTaskGroup, setCurrentTaskGroup] = useState(currentGroupId !== null ? appData.tasks.find(obj => obj._id === currentGroupId) : null)
     useEffect(() => {
-        setCurrentTaskGroup((prev) => appData.tasks.find(obj => obj._id === currentGroupId))
+        setCurrentTaskGroup((prev) => {
+            return appData.tasks.find(obj => obj._id === currentGroupId
+        )})
     }, [currentGroupId, appData.tasks])
 
     return { 
