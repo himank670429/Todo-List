@@ -39,7 +39,7 @@ function DataProvider({children}){
                 new_socket.disconnect();
             }
         }
-    }, [connectionStatus])
+    }, [connectionStatus, appData?.email, socketToken])
     
     useEffect(() => {
         if (!appData) return

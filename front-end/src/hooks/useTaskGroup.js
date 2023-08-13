@@ -14,12 +14,12 @@ function useTaskGroup() {
 
     function getTask(id){
         // console.log(appData.tasks.find(obj => obj._id === id))
-        return appData.tasks.find(obj => obj._id === id)
+        return 
     }
 
     const [currentTaskGroup, setCurrentTaskGroup] = useState(currentGroupId !== null ? getTask(currentGroupId) : null)
     useEffect(() => {
-        setCurrentTaskGroup((prev) => getTask(currentGroupId))
+        setCurrentTaskGroup((prev) => appData.tasks.find(obj => obj._id === currentGroupId))
     }, [currentGroupId, appData.tasks])
 
     return { 
