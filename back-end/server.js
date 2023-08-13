@@ -26,13 +26,9 @@ const {getGoogleUser} = require("./controller/auth/googleAuth");
 const {
     getCache, 
     setCache, 
-    getCacheData,    
     addSocketInstance,
     getSocketInstances,
     removeSocketInstance,
-    addDashboardSocketInstance,
-    removeDashBoardSocketInstance,
-    getDashboardInstance,
 } = require('./controller/cache/localCache');
 
 // setups 
@@ -85,8 +81,6 @@ io.on('connection', socket => {
         if (socket.userId === id){
             await getOrsetCache(id, async () => await findUser(id))
             addSocketInstance(id, socket.id)
-            // emit to all the connected dashboards sockets
-            getDashboardInstance().forEach(socket_id => io.to(socket_id).emit('get-local-cache', getCacheData()))
         }
 
     })
@@ -199,17 +193,14 @@ io.on('connection', socket => {
             cb(null, new Error('unauthorised access'))
         }
     })
-    socket.on('get-local-cache', (access_token, cb) => {
-        const data = jwt.decode(access_token)
-        if (data === process.env.DASHBOARD_ID){
-            addDashboardSocketInstance(socket.id)
-            cb(getCacheData())
-        }
-    })
     // user disconnects
     socket.on('disconnect', () => {
-        removeSocketInstance(socket.id)
-        removeDashBoardSocketInstance(socket.id)
+        try{
+            removeSocketInstance(socket.id)
+        }
+        catch(error){
+            console.log(error.message)
+        }
     })
 })  
 
@@ -224,18 +215,6 @@ app.post('/api/login/google', async (req, res) => {
     catch(error){
         if (error.reponse.status === 401) res.status(401).send({message : "unauthorized access"})
         else res.status(500).send({message : "internal server error"})
-    }
-})
-
-
-app.get('/api/login/dashboard', (req, res) => {
-    const {id} = req.query;
-    if (id === process.env.DASHBOARD_ID){
-        const signed_token = jwt.sign(id, process.env.TOKEN_SECRET)
-        res.status(200).send({valid : true, access_token : signed_token})
-    }
-    else{
-        res.status(401).send({valid : false})
     }
 })
 

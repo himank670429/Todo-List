@@ -30,18 +30,6 @@ function deleteCache(key){
         throw new Error(error?.message)
     }
 }
-function getCacheData() {
-    try {
-        const transformedData = {};
-        for (const userEmail in userCache) {
-            const socketInstances = userCache[userEmail].socket_instance;
-            transformedData[userEmail] = socketInstances;
-        }
-        return transformedData;
-    } catch (error) {
-        throw new Error(error?.message);
-    }
-}
 
 function addSocketInstance(key, socket_id) {
     try {
@@ -81,35 +69,10 @@ function removeSocketInstance(socket_id) {
             if (userCache[key].socket_instance.length === 0) {
                 setInterval(() => {
                     delete userCache[key];
+                    delete socketCache[socket_id];
                 }, 300000); // delete the user after 5 mins
             }
-            delete socketCache[socket_id];
         }
-    } catch (error) {
-        throw new Error(error?.message);
-    }
-}
-
-function getDashboardInstance() {
-    try {
-        return [...dashboardSockets];
-    } catch (error) {
-        throw new Error(error?.message);
-    }
-}
-
-function addDashboardSocketInstance(id) {
-    try {
-        if (dashboardSockets.includes(id)) return;
-        dashboardSockets.push(id);
-    } catch (error) {
-        throw new Error(error?.message);
-    }
-}
-
-function removeDashBoardSocketInstance(id) {
-    try {
-        dashboardSockets = dashboardSockets.filter(item => item !== id);
     } catch (error) {
         throw new Error(error?.message);
     }
@@ -119,12 +82,8 @@ module.exports = {
     setCache, 
     getCache, 
     deleteCache, 
-    getCacheData,
     addSocketInstance,
     checkSocketInstance,
     removeSocketInstance,
     getSocketInstances,
-    addDashboardSocketInstance,
-    removeDashBoardSocketInstance,
-    getDashboardInstance,
 }

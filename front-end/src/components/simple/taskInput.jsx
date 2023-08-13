@@ -31,7 +31,7 @@ function TaskInput() {
         {(inputMode)
         ? <>
             <i className="fa-regular fa-circle card-input-item"></i>
-            <input autoFocus = {true} type = "text" onKeyDown={(e) => {
+            <input autoComplete = 'off' autoFocus = {true} type = "text" onKeyDown={(e) => {
                 if (e.key === "Enter") addTask()
                 if (e.key === "Escape") cancel()
             }} onChange={(e) => setTaskInput(e.target.value)}/>

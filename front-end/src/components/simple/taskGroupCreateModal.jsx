@@ -43,7 +43,7 @@ export default function TaskGroupCreateModal(){
 
                 <div className = 'modal-section'>
                     <label className = "modal-container-label" htmlFor = 'category-name'>category name : {category.length}</label>
-                    <input ref = {categoryRef} className = "modal-container-input input-text" type = 'text' id = 'category-name' max={12} placeholder="e.g. Daily Task" onChange={(e) => setCategory(e.target.value)}/>
+                    <input autoComplete="off" ref = {categoryRef} className = "modal-container-input input-text" type = 'text' id = 'category-name' max={12} placeholder="e.g. Daily Task" onChange={(e) => setCategory(e.target.value)}/>
                     <RenderNote />
                 </div>
                 
