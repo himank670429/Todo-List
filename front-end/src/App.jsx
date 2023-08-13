@@ -17,7 +17,18 @@ function App() {
   const {data} = useAppData();
   return (
     <GoogleOAuthProvider clientId = {process.env.REACT_APP_CLIENT_ID}>
-    https://dev-himank-todo.onrender.com/
+    <Routes>
+      <Route path = '/' element = {<LoadingPage />} />
+      <Route path = '/Login' element = {<LoginPage />} />
+      <Route element = {<RequireAuth />}>
+        <Route path = '/Home' element = {<RequireData data = {data} to = '/'><HomePage /></RequireData>}/>
+        <Route path = '/Task' element = {<RequireData data = {data} to = '/'><TaskPage /></RequireData>}/> 
+        <Route path = '/About' element = {<RequireData data = {data} to = '/'><AboutUsPage /></RequireData>}/> 
+      </Route>
+      <Route path = '/Terms' element = {<TermsPage />} />
+      <Route path = '/Privacy' element = {<PrivacyPage />} />
+      <Route path = '*' element = {<NotFoundPage />} />
+    </Routes>
     </GoogleOAuthProvider>
   )
 }
