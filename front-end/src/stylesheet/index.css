@@ -511,6 +511,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  position: relative;
 }
 .login .logo {
   font-size: 40px;
@@ -520,15 +521,28 @@
 .login .note {
   color: #4B4B4B;
   font-size: 20px;
-  margin-block: 1rem;
   font-weight: bold;
   line-height: 2rem;
   text-align: center;
 }
-.login .buttons {
+.login .spinner-container {
+  position: relative;
+}
+.login .spinner-container .spinner {
+  position: absolute;
+  top: 1rem;
+  right: 50%;
+  color: #0277FF;
+  animation: rotate 1.5s infinite cubic-bezier(0.28, -0.01, 0.76, 1);
+}
+.login .note-small {
+  font-size: 13px;
+}
+.login .button {
+  margin-top: 2rem;
   display: flex;
 }
-.login .buttons a {
+.login .button a {
   text-decoration: none;
 }
 
@@ -544,6 +558,14 @@
   color: inherit;
 }
 
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
 * {
   margin: 0;
   padding: 0;
