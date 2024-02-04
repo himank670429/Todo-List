@@ -24,7 +24,7 @@ function DataProvider({children}){
     useEffect(() => {
         if (connectionStatus.app_data && connectionStatus.socket_token){
             // now create a new connection and register it self to the server
-            const new_socket = io.connect(process.env.REACT_APP_SERVER_URL, {
+            const new_socket = io.connect(import.meta.env.VITE_SERVER_URL, {
                 query : {
                     token : socketToken
                 }
@@ -99,7 +99,7 @@ function DataProvider({children}){
 
     // helper function 
     async function login(access_token){
-        const res = await axios.post(`${process.env.REACT_APP_SERVER_URL}/api/login/google`, {access_token})
+        const res = await axios.post(`${import.meta.env.VITE_SERVER_URL}/api/login/google`, {access_token})
         return res.data
     }
 
