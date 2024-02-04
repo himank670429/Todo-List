@@ -14,3 +14,6 @@
 - **Added** : added loading spinner on the login screen to before redirecting to Home Page.
 
 --- 
+
+### version 1.0.2 - 04/02/2024
+- **changed** : changed code base from react app to vite app, minor code changes
