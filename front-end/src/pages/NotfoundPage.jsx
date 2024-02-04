@@ -8,7 +8,9 @@ function NotfoundPage() {
         }, 10_000);
     }, [navigate])
     return (
-    <div>Notfound</div>
+        <div className = 'not-found'>
+            {'Not Found! :('}
+        </div>
     )
 }
 

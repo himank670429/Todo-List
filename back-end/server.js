@@ -213,7 +213,7 @@ app.post('/api/login/google', async (req, res) => {
         res.status(200).send({data : user, token})
     }
     catch(error){
-        if (error.reponse.status === 401) res.status(401).send({message : "unauthorized access"})
+        if (error?.reponse?.status === 401) res.status(401).send({message : "unauthorized access"})
         else res.status(500).send({message : "internal server error"})
     }
 })

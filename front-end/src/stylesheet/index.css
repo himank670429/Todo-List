@@ -558,6 +558,35 @@
   color: inherit;
 }
 
+.loading {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.loading .note {
+  color: #4B4B4B;
+  font-size: 20px;
+  font-weight: bold;
+  line-height: 2rem;
+  text-align: center;
+}
+.loading .note-small {
+  font-size: 13px;
+}
+.loading .spinner-container {
+  position: relative;
+}
+.loading .spinner-container .spinner {
+  position: absolute;
+  top: 1rem;
+  right: 50%;
+  color: #0277FF;
+  animation: rotate 1.5s infinite cubic-bezier(0.28, -0.01, 0.76, 1);
+}
+
 @keyframes rotate {
   0% {
     transform: rotate(0deg);
@@ -589,4 +618,4 @@ body::-webkit-scrollbar-thumb {
   height: 100dvh;
   display: flex;
   flex-direction: column;
-}
+}/*# sourceMappingURL=index.css.map */
